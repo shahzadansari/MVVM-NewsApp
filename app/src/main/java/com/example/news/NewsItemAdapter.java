@@ -1,6 +1,8 @@
 package com.example.news;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +15,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.newsItem.R;
 
+import java.util.List;
+
 public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHolder> {
 
     private Context mContext;
-    private NewsItem mNewsItem;
+    private List<NewsItem> newsItemList;
+    private static final String TAG = "NewsItemAdapter";
 
-    public NewsItemAdapter(Context mContext, NewsItem mNewsItem) {
+    public NewsItemAdapter(Context mContext, List<NewsItem> newsItemList) {
         this.mContext = mContext;
-        this.mNewsItem = mNewsItem;
+        this.newsItemList = newsItemList;
     }
 
     @NonNull
@@ -35,20 +40,21 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Glide.with(mContext)
-                .load(mNewsItem.getUrlToImage())
+                .load(newsItemList.get(position).getUrlToImage())
                 .into(holder.imageView);
 
-        holder.textViewTitle.setText(mNewsItem.getTitle());
+        holder.textViewTitle.setText(newsItemList.get(position).getTitle());
 
-        holder.textViewDescription.setText(mNewsItem.getDescription());
+        holder.textViewDescription.setText(newsItemList.get(position).getDescription());
     }
 
     @Override
     public int getItemCount() {
-        return 1;
+        return newsItemList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder
+            implements View.OnClickListener {
 
         private ImageView imageView;
         private TextView textViewTitle;
@@ -59,6 +65,16 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
             imageView = itemView.findViewById(R.id.title_image);
             textViewTitle = itemView.findViewById(R.id.news_title);
             textViewDescription = itemView.findViewById(R.id.news_description);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            int position = getAdapterPosition();
+            Uri newsItemUri = Uri.parse(newsItemList.get(position).getUrl());
+            Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsItemUri);
+            mContext.startActivity(websiteIntent);
         }
     }
 
