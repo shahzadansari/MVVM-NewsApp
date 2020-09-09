@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.news.JSONResponse.NewsItem;
 import com.example.newsItem.R;
 
 import java.util.ArrayList;

@@ -3,9 +3,9 @@ package com.example.news;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.news.JSONResponse.RootJsonData;
+import com.example.news.JSONResponse.NewsItem;
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,28 +44,11 @@ public class QueryUtils {
         }
 
         List<NewsItem> newsItemList = new ArrayList<>();
-        try {
 
-            JSONObject rootObject = new JSONObject(newsJSON);
-            JSONArray articlesList = rootObject.optJSONArray("articles");
+        Gson gson = new Gson();
 
-            for (int i = 0; i < articlesList.length(); i++) {
-
-                JSONObject newsArticle = articlesList.optJSONObject(i);
-
-                String title = newsArticle.optString("title");
-                String description = newsArticle.optString("description");
-                String url = newsArticle.optString("url");
-                String urlToImage = newsArticle.optString("urlToImage");
-
-                NewsItem newsItem = new NewsItem(title, description, url, urlToImage);
-
-                newsItemList.add(newsItem);
-            }
-
-        } catch (JSONException ex) {
-            ex.printStackTrace();
-        }
+        RootJsonData rootObject = gson.fromJson(newsJSON, RootJsonData.class);
+        newsItemList = rootObject.getArticles();
 
         return newsItemList;
     }
