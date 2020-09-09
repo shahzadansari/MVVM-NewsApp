@@ -1,10 +1,14 @@
 package com.example.news;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -23,6 +27,7 @@ public class MainActivity extends AppCompatActivity
     public static final int NEWS_LOADER_ID = 6;
     public static final String REQUEST_URL = "https://newsapi.org/v2/top-headlines?country=us&apiKey=c2194f57d73e4392ae4ee0bf69e9d391";
     private ProgressBar progressBar;
+    private TextView emptyStateTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +35,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         progressBar = findViewById(R.id.progress_circular);
+        emptyStateTextView = findViewById(R.id.empty_view);
 
         recyclerView = findViewById(R.id.recycler_view);
 
@@ -42,8 +48,19 @@ public class MainActivity extends AppCompatActivity
 
         recyclerView.setLayoutManager(linearLayoutManager);
 
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+
+        } else {
+            progressBar.setVisibility(View.GONE);
+            emptyStateTextView.setText(R.string.no_internet_connection);
+        }
     }
 
     @Override
@@ -56,6 +73,9 @@ public class MainActivity extends AppCompatActivity
     public void onLoadFinished(Loader<List<NewsItem>> loader, List<NewsItem> newsItems) {
 
         progressBar.setVisibility(View.GONE);
+        if(newsItems == null){
+            emptyStateTextView.setText(R.string.no_news_found);
+        }
 
         if (newsItems != null && !newsItems.isEmpty()) {
             adapter = new NewsItemAdapter(this, newsItems);
