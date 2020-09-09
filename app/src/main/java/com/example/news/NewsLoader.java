@@ -6,6 +6,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.news.JSONResponse.NewsItem;
+
 import java.util.List;
 
 public class NewsLoader extends AsyncTaskLoader<List<NewsItem>> {
