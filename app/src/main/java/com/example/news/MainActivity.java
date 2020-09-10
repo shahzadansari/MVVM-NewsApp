@@ -5,6 +5,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,6 +37,11 @@ public class MainActivity extends AppCompatActivity {
     private TextView emptyStateTextView;
     private Context mContext;
     private SwipeRefreshLayout swipeRefreshLayout;
+    public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
+    public static final String SORT_ORDER = "popularity";
+    public EditText editText;
+    public Button button;
+    private String keyword = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +52,14 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_circular);
         emptyStateTextView = findViewById(R.id.empty_view);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        editText = findViewById(R.id.edit_text);
+        button = findViewById(R.id.button);
 
         initEmptyRecyclerView();
-        fetchData();
+        fetchData("");
+        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
 
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchData());
+        button.setOnClickListener(view -> searchKeyword(view));
     }
 
     public void initEmptyRecyclerView() {
@@ -63,14 +74,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
-    public void fetchData() {
+    public void fetchData(String keyword) {
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
 
-            Call<RootJsonData> rootJsonDataCall = createJsonDataCall();
+            Call<RootJsonData> rootJsonDataCall = createJsonDataCall(keyword);
             rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
                 @Override
                 public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -92,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public Call<RootJsonData> createJsonDataCall() {
+    public Call<RootJsonData> createJsonDataCall(String keyword) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://newsapi.org/v2/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -100,7 +111,14 @@ public class MainActivity extends AppCompatActivity {
 
         NewsAPI newsAPI = retrofit.create(NewsAPI.class);
 
-        Call<RootJsonData> rootJsonDataCall = newsAPI.getRootJsonData();
+        Call<RootJsonData> rootJsonDataCall;
+
+        if (keyword.isEmpty()) {
+            rootJsonDataCall = newsAPI.getTopHeadlines();
+        } else {
+            rootJsonDataCall = newsAPI.getEverythingFromKeyword(keyword, API_KEY, SORT_ORDER);
+        }
+
         return rootJsonDataCall;
     }
 
@@ -119,5 +137,19 @@ public class MainActivity extends AppCompatActivity {
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
+    }
+
+    public void searchKeyword(View view) {
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        if (inputManager != null) {
+            inputManager.hideSoftInputFromWindow(view.getWindowToken(),
+                    InputMethodManager.HIDE_NOT_ALWAYS);
+        }
+        initEmptyRecyclerView();
+        progressBar.setVisibility(View.VISIBLE);
+        keyword = editText.getText().toString();
+        fetchData(keyword);
     }
 }
