@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<RootJsonData> call, Throwable t) {
+                    swipeRefreshLayout.setRefreshing(false);
                     emptyStateTextView.setText(t.getMessage());
                 }
             });
