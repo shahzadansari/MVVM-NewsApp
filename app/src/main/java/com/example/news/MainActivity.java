@@ -114,9 +114,10 @@ public class MainActivity extends AppCompatActivity {
             emptyStateTextView.setText(R.string.no_news_found);
         }
 
-        if (newsItemList != null && !newsItemList.isEmpty()) {
+        if (!newsItemList.isEmpty()) {
             adapter = new NewsItemAdapter(mContext, newsItemList);
             recyclerView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
         }
     }
 }
