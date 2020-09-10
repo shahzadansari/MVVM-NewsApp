@@ -1,4 +1,4 @@
-package com.example.news;
+package com.example.news.adapters;
 
 import android.content.Context;
 import android.content.Intent;
