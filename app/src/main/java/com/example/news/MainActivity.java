@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private Context mContext;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +43,12 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
         progressBar = findViewById(R.id.progress_circular);
         emptyStateTextView = findViewById(R.id.empty_view);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
 
         initEmptyRecyclerView();
         fetchData();
+
+        swipeRefreshLayout.setOnRefreshListener(() -> fetchData());
     }
 
     public void initEmptyRecyclerView() {
@@ -69,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
             rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
                 @Override
                 public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
+                    swipeRefreshLayout.setRefreshing(false);
                     initRecyclerViewWithResponseData(response);
                 }
 
@@ -82,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
             progressBar.setVisibility(View.GONE);
             emptyStateTextView.setText(R.string.no_internet_connection);
         }
+
     }
 
     public Call<RootJsonData> createJsonDataCall() {
