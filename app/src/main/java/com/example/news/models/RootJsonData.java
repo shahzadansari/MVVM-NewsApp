@@ -1,4 +1,4 @@
-package com.example.news.JSONResponse;
+package com.example.news.models;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -13,9 +13,9 @@ public class RootJsonData {
     private int totalResults;
 
     @SerializedName("articles")
-    private List<NewsItem> articles = null;
+    private List<NewsItem> newsItemList = null;
 
-    public List<NewsItem> getArticles() {
-        return articles;
+    public List<NewsItem> getNewsItems() {
+        return newsItemList;
     }
 }
