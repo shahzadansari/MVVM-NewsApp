@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.news.JSONResponse.NewsItem;
+import com.example.news.models.NewsItem;
 import com.example.newsItem.R;
 
 import java.util.List;
@@ -22,7 +22,6 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
 
     private Context mContext;
     private List<NewsItem> newsItemList;
-    private static final String TAG = "NewsItemAdapter";
 
     public NewsItemAdapter(Context mContext, List<NewsItem> newsItemList) {
         this.mContext = mContext;

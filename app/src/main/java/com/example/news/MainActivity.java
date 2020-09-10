@@ -1,8 +1,6 @@
 package com.example.news;
 
-import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Loader;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -14,49 +12,71 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.news.JSONResponse.NewsItem;
+import com.example.news.models.NewsItem;
+import com.example.news.models.RootJsonData;
 import com.example.newsItem.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<List<NewsItem>> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private NewsItemAdapter adapter;
-    public static final int NEWS_LOADER_ID = 6;
-    public static final String REQUEST_URL = "https://newsapi.org/v2/top-headlines?country=us&apiKey=c2194f57d73e4392ae4ee0bf69e9d391";
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
+    private Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mContext = this;
         progressBar = findViewById(R.id.progress_circular);
         emptyStateTextView = findViewById(R.id.empty_view);
 
+        initEmptyRecyclerView();
+        fetchData();
+    }
+
+    public void initEmptyRecyclerView() {
+
         recyclerView = findViewById(R.id.recycler_view);
-
-        adapter = new NewsItemAdapter(this, new ArrayList<NewsItem>());
-
+        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>());
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
                 (this, LinearLayoutManager.VERTICAL, false);
 
         recyclerView.setLayoutManager(linearLayoutManager);
+    }
 
+    public void fetchData() {
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
 
-            LoaderManager loaderManager = getLoaderManager();
-            loaderManager.initLoader(NEWS_LOADER_ID, null, this);
+            Call<RootJsonData> rootJsonDataCall = createJsonDataCall();
+            rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
+                @Override
+                public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
+                    initRecyclerViewWithResponseData(response);
+                }
+
+                @Override
+                public void onFailure(Call<RootJsonData> call, Throwable t) {
+                    emptyStateTextView.setText(t.getMessage());
+                }
+            });
 
         } else {
             progressBar.setVisibility(View.GONE);
@@ -64,29 +84,31 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public Loader<List<NewsItem>> onCreateLoader(int i, Bundle bundle) {
-        Loader newsLoader = new NewsLoader(this, REQUEST_URL);
-        return newsLoader;
+    public Call<RootJsonData> createJsonDataCall() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://newsapi.org/v2/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        NewsAPI newsAPI = retrofit.create(NewsAPI.class);
+
+        Call<RootJsonData> rootJsonDataCall = newsAPI.getRootJsonData();
+        return rootJsonDataCall;
     }
 
-    @Override
-    public void onLoadFinished(Loader<List<NewsItem>> loader, List<NewsItem> newsItems) {
+    public void initRecyclerViewWithResponseData(Response<RootJsonData> response) {
+
+        RootJsonData rootJsonData = response.body();
+        List<NewsItem> newsItemList = rootJsonData.getNewsItems();
 
         progressBar.setVisibility(View.GONE);
-        if(newsItems == null){
+        if (newsItemList.isEmpty()) {
             emptyStateTextView.setText(R.string.no_news_found);
         }
 
-        if (newsItems != null && !newsItems.isEmpty()) {
-            adapter = new NewsItemAdapter(this, newsItems);
+        if (newsItemList != null && !newsItemList.isEmpty()) {
+            adapter = new NewsItemAdapter(mContext, newsItemList);
             recyclerView.setAdapter(adapter);
         }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<NewsItem>> loader) {
-        adapter = null;
-        recyclerView.removeAllViews();
     }
 }
