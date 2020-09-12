@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,12 +39,12 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private Context mContext;
-    private SwipeRefreshLayout swipeRefreshLayout;
-    public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
-    public static final String SORT_ORDER = "popularity";
     public EditText editText;
     public Button button;
     private String keyword = "";
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public static final String SORT_ORDER = "popularity";
+    public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +58,12 @@ public class MainActivity extends AppCompatActivity {
         editText = findViewById(R.id.edit_text);
         button = findViewById(R.id.button);
 
+        if(savedInstanceState != null){
+            keyword = savedInstanceState.getString("keyword");
+        }
+
         initEmptyRecyclerView();
-        fetchData("");
+        fetchData(keyword);
         swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
 
         button.setOnClickListener(view -> searchKeyword(view));
@@ -153,5 +158,11 @@ public class MainActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         keyword = editText.getText().toString();
         fetchData(keyword);
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("keyword", keyword);
     }
 }
