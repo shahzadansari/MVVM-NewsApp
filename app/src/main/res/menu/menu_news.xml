@@ -9,7 +9,7 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/view_web"
+        android:id="@+id/view_in_browser"
         android:title="Open with browser"
         app:showAsAction="never" />
 

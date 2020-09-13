@@ -1,13 +1,17 @@
 package com.example.news;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -19,7 +23,7 @@ import com.example.newsItem.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-public class NewsDetailActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener{
+public class NewsDetailActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
 
     private Toolbar toolbar;
     private ImageView imageView;
@@ -134,5 +138,40 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
             isHideToolbarView = !isHideToolbarView;
         }
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_news, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+        if (id == R.id.view_in_browser) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(mUrl));
+            startActivity(intent);
+            return true;
+
+        } else if (id == R.id.share) {
+
+            try {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("text/plan");
+                intent.putExtra(Intent.EXTRA_SUBJECT, mSource);
+                String body = mTitle + "\n" + mUrl + "\n" + "Via News App." + "\n";
+                intent.putExtra(Intent.EXTRA_TEXT, body);
+                startActivity(Intent.createChooser(intent, "Share with :"));
+
+            } catch (Exception e) {
+                Toast.makeText(this, "Oops! \nCannot share this news", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
