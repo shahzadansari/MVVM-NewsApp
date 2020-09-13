@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     public void initEmptyRecyclerView() {
 
         recyclerView = findViewById(R.id.recycler_view);
-        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>());
+        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), this);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (!newsItemList.isEmpty()) {
-            adapter = new NewsItemAdapter(mContext, newsItemList);
+            adapter = new NewsItemAdapter(mContext, newsItemList, this);
             recyclerView.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
