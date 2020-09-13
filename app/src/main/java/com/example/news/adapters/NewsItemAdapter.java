@@ -13,6 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
+import com.example.news.Utils;
 import com.example.news.models.NewsItem;
 import com.example.newsItem.R;
 
@@ -39,8 +43,17 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(Utils.getRandomDrawableColor());
+        requestOptions.error(Utils.getRandomDrawableColor());
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
+        requestOptions.centerCrop();
+
         Glide.with(mContext)
                 .load(newsItemList.get(position).getUrlToImage())
+                .apply(requestOptions)
+                .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.imageView);
 
         holder.textViewTitle.setText(newsItemList.get(position).getTitle());
