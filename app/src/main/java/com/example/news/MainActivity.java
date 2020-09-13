@@ -1,18 +1,23 @@
 package com.example.news;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         editText = findViewById(R.id.edit_text);
         button = findViewById(R.id.button);
 
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
         }
 
@@ -66,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         fetchData(keyword);
         swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
 
-        button.setOnClickListener(view -> searchKeyword(view));
+//        button.setOnClickListener(view -> searchKeyword(view));
     }
 
     public void initEmptyRecyclerView() {
@@ -146,17 +151,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void searchKeyword(View view) {
-        InputMethodManager inputManager = (InputMethodManager)
-                getSystemService(Context.INPUT_METHOD_SERVICE);
-
-        if (inputManager != null) {
-            inputManager.hideSoftInputFromWindow(view.getWindowToken(),
-                    InputMethodManager.HIDE_NOT_ALWAYS);
-        }
+    public void searchKeyword(String query) {
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        keyword = editText.getText().toString();
+        keyword = query;
         fetchData(keyword);
     }
 
@@ -164,5 +162,39 @@ public class MainActivity extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("keyword", keyword);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setQueryHint("Search Latest News...");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.length() > 2) {
+                    searchKeyword(query);
+                } else {
+                    Toast.makeText(MainActivity.this, "Type more than two letters!", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+        searchMenuItem.getIcon().setVisible(false, false);
+
+        return true;
     }
 }
