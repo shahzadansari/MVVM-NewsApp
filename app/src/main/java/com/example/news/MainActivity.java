@@ -9,8 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -44,8 +43,6 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private Context mContext;
-    public EditText editText;
-    public Button button;
     private String keyword = "";
     private SwipeRefreshLayout swipeRefreshLayout;
     public static final String SORT_ORDER = "popularity";
@@ -60,8 +57,6 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_circular);
         emptyStateTextView = findViewById(R.id.empty_view);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh);
-        editText = findViewById(R.id.edit_text);
-        button = findViewById(R.id.button);
 
         if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
@@ -70,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
         initEmptyRecyclerView();
         fetchData(keyword);
         swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
-
-//        button.setOnClickListener(view -> searchKeyword(view));
     }
 
     public void initEmptyRecyclerView() {
@@ -169,6 +162,12 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu_main, menu);
 
+        searchKeywordFromSearchView(menu);
+
+        return true;
+    }
+
+    private void searchKeywordFromSearchView(Menu menu) {
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
@@ -193,8 +192,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        searchMenuItem.getIcon().setVisible(false, false);
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
 
-        return true;
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                keyword = "";
+                return true;
+            }
+        });
+
+        searchMenuItem.getIcon().setVisible(false, false);
     }
 }
