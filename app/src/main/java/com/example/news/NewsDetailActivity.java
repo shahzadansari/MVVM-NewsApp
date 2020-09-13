@@ -6,6 +6,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,8 +16,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.newsItem.R;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-public class NewsDetailActivity extends AppCompatActivity {
+public class NewsDetailActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener{
 
     private Toolbar toolbar;
     private ImageView imageView;
@@ -30,6 +33,9 @@ public class NewsDetailActivity extends AppCompatActivity {
     private String mDate;
     private String mSource;
     private String mAuthor;
+    private boolean isHideToolbarView = false;
+    private LinearLayout titleAppbar;
+    private AppBarLayout appBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +47,13 @@ public class NewsDetailActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle("");
+
+        appBarLayout = findViewById(R.id.appbar);
+        appBarLayout.addOnOffsetChangedListener(this);
+
+        titleAppbar = findViewById(R.id.title_appbar);
         imageView = findViewById(R.id.image);
         appbar_title = findViewById(R.id.title_on_appbar);
         appbar_subtitle = findViewById(R.id.subtitle_on_appbar);
@@ -105,5 +118,21 @@ public class NewsDetailActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+        int maxScroll = appBarLayout.getTotalScrollRange();
+        float percentage = (float) Math.abs(verticalOffset) / (float) maxScroll;
+
+        if (percentage == 1f && isHideToolbarView) {
+            titleAppbar.setVisibility(View.VISIBLE);
+            isHideToolbarView = !isHideToolbarView;
+
+        } else if (percentage < 1f && !isHideToolbarView) {
+            titleAppbar.setVisibility(View.GONE);
+            isHideToolbarView = !isHideToolbarView;
+        }
+
     }
 }
