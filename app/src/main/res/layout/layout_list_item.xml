@@ -19,6 +19,7 @@
             android:layout_height="200dp"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
+            android:transitionName="img"
             tools:ignore="UnusedAttribute" />
 
         <TextView

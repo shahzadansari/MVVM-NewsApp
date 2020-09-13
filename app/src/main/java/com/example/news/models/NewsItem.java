@@ -43,4 +43,20 @@ public class NewsItem {
     public String getUrlToImage() {
         return urlToImage;
     }
+
+    public Source getSource() {
+        return source;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getPublishedAt() {
+        return publishedAt;
+    }
+
+    public String getContent() {
+        return content;
+    }
 }
