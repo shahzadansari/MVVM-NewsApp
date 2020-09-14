@@ -66,7 +66,7 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
 
         Intent intent = getIntent();
         mUrl = intent.getStringExtra("url");
-        mImg = intent.getStringExtra("img");
+        mImg = intent.getStringExtra("urlToImage");
         mTitle = intent.getStringExtra("title");
         mDate = intent.getStringExtra("date");
         mSource = intent.getStringExtra("source");

@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,7 +61,7 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
                 .load(newsItemList.get(position).getUrlToImage())
                 .apply(requestOptions)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .into(holder.imageView);
+                .into(holder.titleImage);
 
         holder.textViewTitle.setText(newsItemList.get(position).getTitle());
 
@@ -75,39 +76,43 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
     public class ViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
-        private ImageView imageView;
+        private ImageView titleImage;
+        private TextView textViewAuthor;
         private TextView textViewTitle;
         private TextView textViewDescription;
+        private TextView textViewSource;
+        private TextView textViewTime;
+        private TextView textViewPublishedAt;
+        private ProgressBar progressBarInImage;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.title_image);
+            titleImage = itemView.findViewById(R.id.title_image);
             textViewTitle = itemView.findViewById(R.id.text_view_news_title);
+            textViewAuthor = itemView.findViewById(R.id.text_view_author);
+            textViewSource = itemView.findViewById(R.id.text_view_source);
+            textViewTime = itemView.findViewById(R.id.text_view_time);
             textViewDescription = itemView.findViewById(R.id.text_view_news_description);
+            textViewPublishedAt = itemView.findViewById(R.id.text_view_publishedAt);
+            progressBarInImage = itemView.findViewById(R.id.progress_bar_image);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
 
-//            int position = getAdapterPosition();
-//            Uri newsItemUri = Uri.parse(newsItemList.get(position).getUrl());
-//            Intent websiteIntent = new Intent(Intent.ACTION_VIEW, newsItemUri);
-//            mContext.startActivity(websiteIntent);
-
-
             Intent intent = new Intent(mContext, NewsDetailActivity.class);
 
             int position = getAdapterPosition();
             intent.putExtra("url", newsItemList.get(position).getUrl());
             intent.putExtra("title", newsItemList.get(position).getTitle());
-            intent.putExtra("img", newsItemList.get(position).getUrlToImage());
+            intent.putExtra("urlToImage", newsItemList.get(position).getUrlToImage());
             intent.putExtra("date", newsItemList.get(position).getPublishedAt());
             intent.putExtra("source", newsItemList.get(position).getSource().getName());
             intent.putExtra("author", newsItemList.get(position).getAuthor());
 
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation
-                    (mainActivity, imageView, ViewCompat.getTransitionName(imageView));
+                    (mainActivity, titleImage, ViewCompat.getTransitionName(titleImage));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 mContext.startActivity(intent, options.toBundle());
