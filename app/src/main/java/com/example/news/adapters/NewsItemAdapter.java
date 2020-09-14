@@ -37,12 +37,14 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
 
     private Context mContext;
     private List<NewsItem> newsItemList;
-    private MainActivity mainActivity;
+
+    // For transition animation
+    private MainActivity main_activity;
 
     public NewsItemAdapter(Context mContext, List<NewsItem> newsItemList, MainActivity mainActivity) {
         this.mContext = mContext;
         this.newsItemList = newsItemList;
-        this.mainActivity = mainActivity;
+        this.main_activity = mainActivity;
     }
 
     @NonNull
@@ -134,7 +136,7 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
             intent.putExtra("author", newsItemList.get(position).getAuthor());
 
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation
-                    (mainActivity, titleImage, ViewCompat.getTransitionName(titleImage));
+                    (main_activity, titleImage, ViewCompat.getTransitionName(titleImage));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 mContext.startActivity(intent, options.toBundle());
