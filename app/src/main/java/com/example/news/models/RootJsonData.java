@@ -18,4 +18,12 @@ public class RootJsonData {
     public List<NewsItem> getNewsItems() {
         return newsItemList;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public int getTotalResults() {
+        return totalResults;
+    }
 }
