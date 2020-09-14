@@ -28,13 +28,13 @@ public class NewsDetailActivity extends AppCompatActivity
         implements AppBarLayout.OnOffsetChangedListener {
 
     private Toolbar toolbar;
-    private ImageView imageView;
-    private TextView appbar_title;
-    private TextView appbar_subtitle;
+    private ImageView titleImageView;
+    private TextView appbarTitleTextView;
+    private TextView appbarSubtitleTextView;
     private TextView titleTextView;
     private TextView authorTextView;
     private String mUrl;
-    private String mImg;
+    private String mUrlToImage;
     private String mTitle;
     private String mDate;
     private String mSource;
@@ -54,23 +54,23 @@ public class NewsDetailActivity extends AppCompatActivity
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle("");
 
         appBarLayout = findViewById(R.id.layout_appbar);
         appBarLayout.addOnOffsetChangedListener(this);
-        frameLayoutDateBehavior = findViewById(R.id.date_behavior);
 
+        frameLayoutDateBehavior = findViewById(R.id.date_behavior);
         titleAppbar = findViewById(R.id.layout_title_appbar);
-        imageView = findViewById(R.id.title_image);
-        appbar_title = findViewById(R.id.title_on_layout_title_appbar);
-        appbar_subtitle = findViewById(R.id.subtitle_on_layout_title_appbar);
+        titleImageView = findViewById(R.id.image_view_title);
+        appbarTitleTextView = findViewById(R.id.title_on_layout_title_appbar);
+        appbarSubtitleTextView = findViewById(R.id.subtitle_on_layout_title_appbar);
         authorTextView = findViewById(R.id.text_view_source_author_time);
         titleTextView = findViewById(R.id.text_view_title_news);
 
         Intent intent = getIntent();
         mUrl = intent.getStringExtra("url");
-        mImg = intent.getStringExtra("urlToImage");
+        mUrlToImage = intent.getStringExtra("urlToImage");
         mTitle = intent.getStringExtra("title");
         mDate = intent.getStringExtra("date");
         mSource = intent.getStringExtra("source");
@@ -80,26 +80,31 @@ public class NewsDetailActivity extends AppCompatActivity
         requestOptions.error(Utils.getRandomDrawableColor());
 
         Glide.with(this)
-                .load(mImg)
+                .load(mUrlToImage)
                 .apply(requestOptions)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView);
+                .into(titleImageView);
 
-        appbar_title.setText(mSource);
-        appbar_subtitle.setText(mUrl);
+        appbarTitleTextView.setText(mSource);
+        appbarSubtitleTextView.setText(mUrl);
+        titleTextView.setText(mTitle);
+        authorTextView.setText(mSource + appendAuthorWithBullet(mAuthor));
+
+        initWebView(mUrl);
+
+    }
+
+    private String appendAuthorWithBullet(String mAuthor) {
 
         String author;
-        if (mAuthor != null) {
-            author = " \u2022 " + mAuthor;
+
+        if (this.mAuthor != null) {
+            author = " \u2022 " + this.mAuthor;
         } else {
             author = "";
         }
 
-        titleTextView.setText(mTitle);
-        authorTextView.setText(mSource + author);
-
-        initWebView(mUrl);
-
+        return author;
     }
 
     private void initWebView(String url) {
@@ -157,7 +162,7 @@ public class NewsDetailActivity extends AppCompatActivity
 
         int id = item.getItemId();
 
-        if (id == R.id.view_in_browser) {
+        if (id == R.id.open_in_browser) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(mUrl));
             startActivity(intent);

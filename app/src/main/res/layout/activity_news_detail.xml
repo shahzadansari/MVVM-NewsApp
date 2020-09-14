@@ -25,7 +25,7 @@
             app:titleEnabled="false">
 
             <ImageView
-                android:id="@+id/title_image"
+                android:id="@+id/image_view_title"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
@@ -55,7 +55,7 @@
                     android:id="@+id/bottom_shadow"
                     android:layout_width="match_parent"
                     android:layout_height="80dp"
-                    android:layout_alignBottom="@id/title_image"
+                    android:layout_alignBottom="@id/image_view_title"
                     android:layout_alignParentBottom="true"
                     android:scaleType="centerCrop"
                     android:src="@drawable/bottom_shadow"
@@ -207,7 +207,7 @@
         android:id="@+id/date_behavior"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/title_image"
+        android:layout_below="@id/image_view_title"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"

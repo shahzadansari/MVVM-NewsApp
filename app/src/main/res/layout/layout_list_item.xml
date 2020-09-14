@@ -17,7 +17,7 @@
         android:background="?android:attr/selectableItemBackground">
 
         <ImageView
-            android:id="@+id/title_image"
+            android:id="@+id/image_view_title"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:adjustViewBounds="true"
@@ -29,7 +29,7 @@
             android:id="@+id/shadow_bottom"
             android:layout_width="match_parent"
             android:layout_height="80dp"
-            android:layout_alignBottom="@id/title_image"
+            android:layout_alignBottom="@id/image_view_title"
             android:src="@drawable/bottom_shadow" />
 
         <ProgressBar
@@ -64,7 +64,7 @@
             android:id="@+id/layout_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/title_image"
+            android:layout_below="@id/image_view_title"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_marginTop="-50dp"
@@ -99,7 +99,7 @@
             android:id="@+id/text_view_news_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/title_image"
+            android:layout_below="@id/image_view_title"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="16dp"
