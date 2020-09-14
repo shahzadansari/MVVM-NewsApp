@@ -23,7 +23,8 @@ import com.example.newsItem.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-public class NewsDetailActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
+public class NewsDetailActivity extends AppCompatActivity
+        implements AppBarLayout.OnOffsetChangedListener {
 
     private Toolbar toolbar;
     private ImageView imageView;
@@ -54,15 +55,15 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
         final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle("");
 
-        appBarLayout = findViewById(R.id.appbar);
+        appBarLayout = findViewById(R.id.layout_appbar);
         appBarLayout.addOnOffsetChangedListener(this);
 
-        titleAppbar = findViewById(R.id.title_appbar);
-        imageView = findViewById(R.id.image);
-        appbar_title = findViewById(R.id.title_on_appbar);
-        appbar_subtitle = findViewById(R.id.subtitle_on_appbar);
-        authorTextView = findViewById(R.id.author);
-        titleTextView = findViewById(R.id.title);
+        titleAppbar = findViewById(R.id.layout_title_appbar);
+        imageView = findViewById(R.id.title_image);
+        appbar_title = findViewById(R.id.title_on_layout_title_appbar);
+        appbar_subtitle = findViewById(R.id.subtitle_on_layout_title_appbar);
+        authorTextView = findViewById(R.id.text_view_source_author_time);
+        titleTextView = findViewById(R.id.text_view_title_news);
 
         Intent intent = getIntent();
         mUrl = intent.getStringExtra("url");
@@ -100,7 +101,7 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
 
     private void initWebView(String url) {
 
-        WebView webView = findViewById(R.id.webView);
+        WebView webView = findViewById(R.id.web_view);
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);

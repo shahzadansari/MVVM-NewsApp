@@ -89,7 +89,7 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
             super(itemView);
             titleImage = itemView.findViewById(R.id.title_image);
             textViewTitle = itemView.findViewById(R.id.text_view_news_title);
-            textViewAuthor = itemView.findViewById(R.id.text_view_author);
+            textViewAuthor = itemView.findViewById(R.id.text_view_source_author_time);
             textViewSource = itemView.findViewById(R.id.text_view_source);
             textViewTime = itemView.findViewById(R.id.text_view_time);
             textViewDescription = itemView.findViewById(R.id.text_view_news_description);
