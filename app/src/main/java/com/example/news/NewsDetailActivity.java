@@ -33,6 +33,7 @@ public class NewsDetailActivity extends AppCompatActivity
     private TextView appbarSubtitleTextView;
     private TextView titleTextView;
     private TextView authorTextView;
+    private TextView datePublishedTextView;
     private String mUrl;
     private String mUrlToImage;
     private String mTitle;
@@ -67,6 +68,7 @@ public class NewsDetailActivity extends AppCompatActivity
         appbarSubtitleTextView = findViewById(R.id.subtitle_on_layout_title_appbar);
         authorTextView = findViewById(R.id.text_view_source_author_time);
         titleTextView = findViewById(R.id.text_view_title_news);
+        datePublishedTextView = findViewById(R.id.text_view_date_published);
 
         Intent intent = getIntent();
         mUrl = intent.getStringExtra("url");
@@ -89,6 +91,7 @@ public class NewsDetailActivity extends AppCompatActivity
         appbarSubtitleTextView.setText(mUrl);
         titleTextView.setText(mTitle);
         authorTextView.setText(mSource + appendAuthorWithBullet(mAuthor));
+        datePublishedTextView.setText(Utils.DateFormat(mDate));
 
         initWebView(mUrl);
 
