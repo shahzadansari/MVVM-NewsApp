@@ -82,8 +82,8 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.title_image);
-            textViewTitle = itemView.findViewById(R.id.news_title);
-            textViewDescription = itemView.findViewById(R.id.news_description);
+            textViewTitle = itemView.findViewById(R.id.text_view_news_title);
+            textViewDescription = itemView.findViewById(R.id.text_view_news_description);
             itemView.setOnClickListener(this);
         }
 

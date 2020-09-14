@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_marginLeft="11dp"
+    android:layout_marginTop="7dp"
+    android:layout_marginRight="11dp"
+    android:layout_marginBottom="7dp"
     android:elevation="2dp"
     app:cardCornerRadius="10dp">
 
@@ -22,24 +25,132 @@
             android:transitionName="img"
             tools:ignore="UnusedAttribute" />
 
+        <ImageView
+            android:id="@+id/shadow_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_alignBottom="@id/title_image"
+            android:src="@drawable/bottom_shadow" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar_image"
+            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="70dp" />
+
+
         <TextView
-            android:id="@+id/news_title"
-            style="@style/TextAppearance.AppCompat.Body2"
+            android:id="@+id/text_view_author"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_alignStart="@+id/text_view_news_title"
+            android:layout_alignLeft="@+id/text_view_news_title"
+            android:layout_alignTop="@+id/layout_date"
+            android:layout_alignEnd="@id/layout_date"
+            android:layout_alignRight="@id/layout_date"
+            android:layout_marginEnd="160dp"
+            android:layout_marginRight="160dp"
+            android:drawablePadding="10dp"
+            android:ellipsize="end"
+            android:gravity="bottom"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="Author"
+            android:textColor="@android:color/white" />
+
+
+        <FrameLayout
+            android:id="@+id/layout_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/title_image"
-            android:padding="8dp"
-            android:text="@string/news_title" />
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="-50dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/background_round_white"
+            android:padding="5dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_date" />
+
+            <TextView
+                android:id="@+id/text_view_publishedAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="27dp"
+                android:layout_marginLeft="27dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="01 January 1990"
+                android:textColor="#606060" />
+
+
+        </FrameLayout>
+
 
         <TextView
-            android:id="@+id/news_description"
-            style="@style/TextAppearance.AppCompat.Body1"
-            android:layout_width="wrap_content"
+            android:id="@+id/text_view_news_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/news_title"
-            android:paddingLeft="8dp"
-            android:paddingBottom="8dp"
-            android:text="@string/news_description" />
+            android:layout_below="@id/title_image"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="16dp"
+            android:fontFamily="sans-serif-light"
+            android:text="Title"
+            android:textColor="@color/colorTextTitle"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_view_news_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_view_news_title"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="16dp"
+            android:text="Desc" />
+
+        <TextView
+            android:id="@+id/text_view_source"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_below="@id/text_view_news_description"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:drawablePadding="10dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="Source"
+            android:textColor="@color/colorTextTitle"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_view_time"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:layout_below="@id/text_view_news_description"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toEndOf="@id/text_view_source"
+            android:layout_toRightOf="@id/text_view_source"
+            android:drawablePadding="10dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="Time" />
 
     </RelativeLayout>
 
