@@ -42,10 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private NewsItemAdapter adapter;
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
+    private TextView textViewTitle;
     private Context mContext;
     private String keyword = "";
     private SwipeRefreshLayout swipeRefreshLayout;
-    public static final String SORT_ORDER = "popularity";
+    public static final String SORT_ORDER = "publishedAt";
     public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
 
     @Override
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_circular);
         emptyStateTextView = findViewById(R.id.empty_view);
         swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+        textViewTitle = findViewById(R.id.text_view_top_headlines);
 
         if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
@@ -90,12 +92,14 @@ public class MainActivity extends AppCompatActivity {
             rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
                 @Override
                 public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
+                    textViewTitle.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     initRecyclerViewWithResponseData(response);
                 }
 
                 @Override
                 public void onFailure(Call<RootJsonData> call, Throwable t) {
+                    textViewTitle.setVisibility(View.INVISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     emptyStateTextView.setText(t.getMessage());
                 }
@@ -103,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.GONE);
             emptyStateTextView.setText(R.string.no_internet_connection);
         }
 

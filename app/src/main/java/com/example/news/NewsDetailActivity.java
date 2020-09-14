@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -23,16 +24,17 @@ import com.example.newsItem.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 
-public class NewsDetailActivity extends AppCompatActivity implements AppBarLayout.OnOffsetChangedListener {
+public class NewsDetailActivity extends AppCompatActivity
+        implements AppBarLayout.OnOffsetChangedListener {
 
     private Toolbar toolbar;
-    private ImageView imageView;
-    private TextView appbar_title;
-    private TextView appbar_subtitle;
+    private ImageView titleImageView;
+    private TextView appbarTitleTextView;
+    private TextView appbarSubtitleTextView;
     private TextView titleTextView;
     private TextView authorTextView;
     private String mUrl;
-    private String mImg;
+    private String mUrlToImage;
     private String mTitle;
     private String mDate;
     private String mSource;
@@ -40,6 +42,7 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
     private boolean isHideToolbarView = false;
     private LinearLayout titleAppbar;
     private AppBarLayout appBarLayout;
+    private FrameLayout frameLayoutDateBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,22 +54,23 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
+        CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setTitle("");
 
-        appBarLayout = findViewById(R.id.appbar);
+        appBarLayout = findViewById(R.id.layout_appbar);
         appBarLayout.addOnOffsetChangedListener(this);
 
-        titleAppbar = findViewById(R.id.title_appbar);
-        imageView = findViewById(R.id.image);
-        appbar_title = findViewById(R.id.title_on_appbar);
-        appbar_subtitle = findViewById(R.id.subtitle_on_appbar);
-        authorTextView = findViewById(R.id.author);
-        titleTextView = findViewById(R.id.title);
+        frameLayoutDateBehavior = findViewById(R.id.date_behavior);
+        titleAppbar = findViewById(R.id.layout_title_appbar);
+        titleImageView = findViewById(R.id.image_view_title);
+        appbarTitleTextView = findViewById(R.id.title_on_layout_title_appbar);
+        appbarSubtitleTextView = findViewById(R.id.subtitle_on_layout_title_appbar);
+        authorTextView = findViewById(R.id.text_view_source_author_time);
+        titleTextView = findViewById(R.id.text_view_title_news);
 
         Intent intent = getIntent();
         mUrl = intent.getStringExtra("url");
-        mImg = intent.getStringExtra("img");
+        mUrlToImage = intent.getStringExtra("urlToImage");
         mTitle = intent.getStringExtra("title");
         mDate = intent.getStringExtra("date");
         mSource = intent.getStringExtra("source");
@@ -76,31 +80,36 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
         requestOptions.error(Utils.getRandomDrawableColor());
 
         Glide.with(this)
-                .load(mImg)
+                .load(mUrlToImage)
                 .apply(requestOptions)
                 .transition(DrawableTransitionOptions.withCrossFade())
-                .into(imageView);
+                .into(titleImageView);
 
-        appbar_title.setText(mSource);
-        appbar_subtitle.setText(mUrl);
-
-        String author;
-        if (mAuthor != null) {
-            author = " \u2022 " + mAuthor;
-        } else {
-            author = "";
-        }
-
+        appbarTitleTextView.setText(mSource);
+        appbarSubtitleTextView.setText(mUrl);
         titleTextView.setText(mTitle);
-        authorTextView.setText(mSource + author);
+        authorTextView.setText(mSource + appendAuthorWithBullet(mAuthor));
 
         initWebView(mUrl);
 
     }
 
+    private String appendAuthorWithBullet(String mAuthor) {
+
+        String author;
+
+        if (this.mAuthor != null) {
+            author = " \u2022 " + this.mAuthor;
+        } else {
+            author = "";
+        }
+
+        return author;
+    }
+
     private void initWebView(String url) {
 
-        WebView webView = findViewById(R.id.webView);
+        WebView webView = findViewById(R.id.web_view);
         webView.getSettings().setLoadsImagesAutomatically(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
@@ -130,10 +139,12 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
         float percentage = (float) Math.abs(verticalOffset) / (float) maxScroll;
 
         if (percentage == 1f && isHideToolbarView) {
+            frameLayoutDateBehavior.setVisibility(View.GONE);
             titleAppbar.setVisibility(View.VISIBLE);
             isHideToolbarView = !isHideToolbarView;
 
         } else if (percentage < 1f && !isHideToolbarView) {
+            frameLayoutDateBehavior.setVisibility(View.VISIBLE);
             titleAppbar.setVisibility(View.GONE);
             isHideToolbarView = !isHideToolbarView;
         }
@@ -151,7 +162,7 @@ public class NewsDetailActivity extends AppCompatActivity implements AppBarLayou
 
         int id = item.getItemId();
 
-        if (id == R.id.view_in_browser) {
+        if (id == R.id.open_in_browser) {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(Uri.parse(mUrl));
             startActivity(intent);
