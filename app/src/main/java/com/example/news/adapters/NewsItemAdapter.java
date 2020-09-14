@@ -2,6 +2,7 @@ package com.example.news.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,14 +12,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.example.news.MainActivity;
 import com.example.news.NewsDetailActivity;
 import com.example.news.Utils;
@@ -60,12 +66,28 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
         Glide.with(mContext)
                 .load(newsItemList.get(position).getUrlToImage())
                 .apply(requestOptions)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.progressBarInImage.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.progressBarInImage.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .into(holder.titleImage);
 
         holder.textViewTitle.setText(newsItemList.get(position).getTitle());
-
         holder.textViewDescription.setText(newsItemList.get(position).getDescription());
+        holder.textViewSource.setText(newsItemList.get(position).getSource().getName());
+        holder.textViewTime.setText(" \u2022 " + Utils.DateToTimeFormat(newsItemList.get(position).getPublishedAt()));
+        holder.textViewPublishedAt.setText(Utils.DateFormat(newsItemList.get(position).getPublishedAt()));
+        holder.textViewAuthor.setText(newsItemList.get(position).getAuthor());
     }
 
     @Override

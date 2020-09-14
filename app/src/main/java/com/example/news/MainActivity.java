@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Context mContext;
     private String keyword = "";
     private SwipeRefreshLayout swipeRefreshLayout;
-    public static final String SORT_ORDER = "popularity";
+    public static final String SORT_ORDER = "publishedAt";
     public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
 
     @Override

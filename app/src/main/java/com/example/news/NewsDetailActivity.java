@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -41,6 +42,7 @@ public class NewsDetailActivity extends AppCompatActivity
     private boolean isHideToolbarView = false;
     private LinearLayout titleAppbar;
     private AppBarLayout appBarLayout;
+    private FrameLayout frameLayoutDateBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,7 @@ public class NewsDetailActivity extends AppCompatActivity
 
         appBarLayout = findViewById(R.id.layout_appbar);
         appBarLayout.addOnOffsetChangedListener(this);
+        frameLayoutDateBehavior = findViewById(R.id.date_behavior);
 
         titleAppbar = findViewById(R.id.layout_title_appbar);
         imageView = findViewById(R.id.title_image);
@@ -131,10 +134,12 @@ public class NewsDetailActivity extends AppCompatActivity
         float percentage = (float) Math.abs(verticalOffset) / (float) maxScroll;
 
         if (percentage == 1f && isHideToolbarView) {
+            frameLayoutDateBehavior.setVisibility(View.GONE);
             titleAppbar.setVisibility(View.VISIBLE);
             isHideToolbarView = !isHideToolbarView;
 
         } else if (percentage < 1f && !isHideToolbarView) {
+            frameLayoutDateBehavior.setVisibility(View.VISIBLE);
             titleAppbar.setVisibility(View.GONE);
             isHideToolbarView = !isHideToolbarView;
         }
