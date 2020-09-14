@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.GONE);
             emptyStateTextView.setText(R.string.no_internet_connection);
         }
 
