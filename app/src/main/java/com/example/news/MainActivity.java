@@ -47,12 +47,21 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
     public static final String SORT_ORDER = "publishedAt";
     private String language = "";
+    private String locale = "";
+
+    private boolean isLanguageAvailable = false;
+    private boolean isLocaleAvailable = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        locale = Utils.getCountry();
+        isLocaleAvailable = Utils.checkLocale(locale);
+
         language = Locale.getDefault().getLanguage();
+        isLanguageAvailable = Utils.checkLanguage(language);
 
         mContext = this;
         progressBar = findViewById(R.id.progress_circular);
@@ -120,7 +129,18 @@ public class MainActivity extends AppCompatActivity {
         Call<RootJsonData> rootJsonDataCall;
 
         if (keyword.isEmpty()) {
-            rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(Locale.getDefault().getCountry(), language, getString(R.string.API_KEY));
+
+            if (isLocaleAvailable) {
+                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, getString(R.string.API_KEY));
+            } else {
+                if (isLanguageAvailable) {
+                    language = Utils.getLanguage();
+                } else {
+                    language = "en";
+                }
+                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, getString(R.string.API_KEY));
+
+            }
         } else {
             rootJsonDataCall = newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
         }

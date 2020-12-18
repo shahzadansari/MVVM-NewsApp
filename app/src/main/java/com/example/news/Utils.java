@@ -30,7 +30,7 @@ public class Utils {
         return vibrantLightColorList[randomNumber];
     }
 
-    public static String DateToTimeFormat(String existingStringDate){
+    public static String DateToTimeFormat(String existingStringDate) {
 
         PrettyTime prettyTime = new PrettyTime(new Locale(getCountry()));
 
@@ -47,7 +47,7 @@ public class Utils {
         return time;
     }
 
-    public static String DateFormat(String existingStringDate){
+    public static String DateFormat(String existingStringDate) {
         String newDate;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("E, d MMM yyyy", new Locale(getCountry()));
         try {
@@ -61,10 +61,48 @@ public class Utils {
         return newDate;
     }
 
-    public static String getCountry(){
+    public static String getCountry() {
         Locale locale = Locale.getDefault();
         String country = locale.getCountry();
         return country.toLowerCase();
     }
 
+    public static String getLanguage() {
+        Locale locale = Locale.getDefault();
+        String country = locale.getLanguage();
+        return country.toLowerCase();
+    }
+
+    public static boolean checkLocale(String locale) {
+        boolean isAvailable = false;
+
+        String[] availableLocales = {"ae", "ar", "at", "au", "be", "bg", "br", "ca", "ch", "cn",
+                "co", "cu", "cz", "de", "eg", "fr", "gb", "gr", "hk", "hu", "id", "ie", "il", "in",
+                "it", "jp", "kr", "lt", "lv", "ma", "mx", "my", "ng", "nl", "no", "nz", "ph", "pl",
+                "pt", "ro", "rs", "ru", "sa", "se", "sg", "si", "sk", "th", "tr", "tw", "ua", "us",
+                "ve", "za"};
+
+        for (String availableLocale : availableLocales) {
+            if (availableLocale.equals(locale)) {
+                return true;
+            }
+        }
+
+        return isAvailable;
+    }
+
+    public static boolean checkLanguage(String language) {
+        boolean isAvailable = false;
+
+        String[] availableLanguages = {"ar", "de", "en", "es", "fr", "he", "it", "nl", "no", "pt",
+                "ru", "se", "ud", "zh"};
+
+        for (String availableLanguage : availableLanguages) {
+            if (availableLanguage.equals(language)) {
+                return true;
+            }
+        }
+
+        return isAvailable;
+    }
 }
