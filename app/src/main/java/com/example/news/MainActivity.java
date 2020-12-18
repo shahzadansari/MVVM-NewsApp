@@ -29,12 +29,11 @@ import com.example.newsItem.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,12 +46,13 @@ public class MainActivity extends AppCompatActivity {
     private String keyword = "";
     private SwipeRefreshLayout swipeRefreshLayout;
     public static final String SORT_ORDER = "publishedAt";
-    public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
+    private String language = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        language = Locale.getDefault().getLanguage();
 
         mContext = this;
         progressBar = findViewById(R.id.progress_circular);
@@ -114,19 +114,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public Call<RootJsonData> createJsonDataCall(String keyword) {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://newsapi.org/v2/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        NewsAPI newsAPI = retrofit.create(NewsAPI.class);
+        NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
 
         Call<RootJsonData> rootJsonDataCall;
 
         if (keyword.isEmpty()) {
             rootJsonDataCall = newsAPI.getTopHeadlines();
         } else {
-            rootJsonDataCall = newsAPI.getEverythingFromKeyword(keyword, API_KEY, SORT_ORDER);
+            rootJsonDataCall = newsAPI.searchArticlesWithKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
         }
 
         return rootJsonDataCall;
