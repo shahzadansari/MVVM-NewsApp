@@ -8,12 +8,28 @@ import retrofit2.http.Query;
 
 public interface NewsAPI {
 
-    @GET("top-headlines?country=us&apiKey=c2194f57d73e4392ae4ee0bf69e9d391")
-    Call<RootJsonData> getTopHeadlines();
+    @GET("top-headlines")
+    Call<RootJsonData> getTopHeadlinesByCountry(@Query("country") String country,
+                                                @Query("language") String language,
+                                                @Query("apiKey") String apiKey);
 
-    @GET("everything")
-    Call<RootJsonData> searchArticlesWithKeyWord(@Query("q") String keyword,
-                                                 @Query("sortBy") String sortBy,
+    @GET("top-headlines")
+    Call<RootJsonData> getTopHeadlinesByLanguage(@Query("language") String language,
+                                                 @Query("apiKey") String apiKey);
+
+    @GET("top-headlines")
+    Call<RootJsonData> getTopHeadlinesByCategory(@Query("category") String category,
                                                  @Query("language") String language,
                                                  @Query("apiKey") String apiKey);
+
+    @GET("top-headlines")
+    Call<RootJsonData> searchNewsByKeyWord(@Query("q") String keyword,
+                                           @Query("language") String language,
+                                           @Query("apiKey") String apiKey);
+
+    @GET("everything")
+    Call<RootJsonData> searchArticlesByKeyWord(@Query("q") String keyword,
+                                               @Query("sortBy") String sortBy,
+                                               @Query("language") String language,
+                                               @Query("apiKey") String apiKey);
 }

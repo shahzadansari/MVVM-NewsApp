@@ -120,9 +120,9 @@ public class MainActivity extends AppCompatActivity {
         Call<RootJsonData> rootJsonDataCall;
 
         if (keyword.isEmpty()) {
-            rootJsonDataCall = newsAPI.getTopHeadlines();
+            rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(Locale.getDefault().getCountry(), language, getString(R.string.API_KEY));
         } else {
-            rootJsonDataCall = newsAPI.searchArticlesWithKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
+            rootJsonDataCall = newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
         }
 
         return rootJsonDataCall;
