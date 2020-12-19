@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/page_news"
+        android:enabled="true"
+        android:icon="@drawable/news"
+        android:title="News" />
+    <item
+        android:id="@+id/page_headlines"
+        android:enabled="true"
+        android:icon="@drawable/headline"
+        android:title="Headlines" />
+
+    <item
+        android:id="@+id/page_articles"
+        android:enabled="true"
+        android:icon="@drawable/ic_articles"
+        android:title="Articles" />
+
+    <item
+        android:id="@+id/page_favorites"
+        android:enabled="true"
+        android:icon="@drawable/ic_favorite"
+        android:title="Favorites" />
+</menu>
