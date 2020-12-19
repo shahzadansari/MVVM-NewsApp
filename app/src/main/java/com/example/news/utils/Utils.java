@@ -1,4 +1,4 @@
-package com.example.news;
+package com.example.news.utils;
 
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;

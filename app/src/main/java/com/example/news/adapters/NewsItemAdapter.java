@@ -27,7 +27,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.example.news.MainActivity;
 import com.example.news.NewsDetailActivity;
-import com.example.news.Utils;
+import com.example.news.utils.Utils;
 import com.example.news.models.NewsItem;
 import com.example.newsItem.R;
 

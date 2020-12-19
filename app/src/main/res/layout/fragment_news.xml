@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.news.NewsFragment">
+    tools:context="com.example.news.fragments.NewsFragment">
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
@@ -28,7 +28,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginRight="16dp"
                     android:fontFamily="sans-serif-light"
-                    android:text="Top Headlines"
+                    android:text="Latest News"
                     android:textColor="@color/colorTextTitle"
                     android:textSize="17sp"
                     android:textStyle="bold"

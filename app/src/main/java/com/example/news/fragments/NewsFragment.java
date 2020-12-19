@@ -1,30 +1,36 @@
-package com.example.news;
+package com.example.news.fragments;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.news.MainActivity;
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.api.NewsAPI;
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
+import com.example.news.utils.ServiceGenerator;
+import com.example.news.utils.Utils;
 import com.example.newsItem.R;
 
 import java.util.ArrayList;
@@ -35,7 +41,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class NewsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private NewsItemAdapter adapter;
@@ -43,62 +49,52 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
     private TextView emptyStateTextView;
     private TextView textViewTitle;
     private Context mContext;
-    private String category = "";
+    private String keyword = "";
     private SwipeRefreshLayout swipeRefreshLayout;
+    public static final String SORT_ORDER = "publishedAt";
     private String language = "";
+    private String locale = "";
     private boolean isLanguageAvailable = false;
-    private Spinner spinner;
-    private CardView cardView;
+    private boolean isLocaleAvailable = false;
 
-    public HeadlinesFragment() {
+    public NewsFragment() {
         // Required empty public constructor
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        language = Locale.getDefault().getLanguage();
-        isLanguageAvailable = Utils.checkLanguage(language);
-        if (isLanguageAvailable) {
-            language = Utils.getLanguage();
-        } else {
-            language = "en";
-        }
-        category = "business";
+        getActivity().setTitle("News");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_headlines, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_news, container, false);
+
+        locale = Utils.getCountry();
+        isLocaleAvailable = Utils.checkLocale(locale);
+
+        language = Locale.getDefault().getLanguage();
+        isLanguageAvailable = Utils.checkLanguage(language);
+
         mContext = getActivity();
         progressBar = rootView.findViewById(R.id.progress_circular);
         emptyStateTextView = rootView.findViewById(R.id.empty_view);
         swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh);
         textViewTitle = rootView.findViewById(R.id.text_view_top_headlines);
         recyclerView = rootView.findViewById(R.id.recycler_view);
-        spinner = rootView.findViewById(R.id.spinner_category);
-        cardView = rootView.findViewById(R.id.card_view);
-
-        spinner.setOnItemSelectedListener(this);
-        // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
-                R.array.categories_array, android.R.layout.simple_spinner_item);
-
-        // Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        // Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
 
         if (savedInstanceState != null) {
-            category = savedInstanceState.getString("category");
+            keyword = savedInstanceState.getString("keyword");
         }
 
         initEmptyRecyclerView();
-        fetchData(category);
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(category));
+        fetchData(keyword);
+        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
+
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -113,19 +109,17 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
-    public void fetchData(String category) {
+    public void fetchData(String keyword) {
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
 
-            Call<RootJsonData> rootJsonDataCall = createJsonDataCall(category);
+            Call<RootJsonData> rootJsonDataCall = createJsonDataCall(keyword);
             rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
                 @Override
                 public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
-                    cardView.setVisibility(View.VISIBLE);
-                    spinner.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     initRecyclerViewWithResponseData(response);
@@ -133,8 +127,6 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
                 @Override
                 public void onFailure(Call<RootJsonData> call, Throwable t) {
-                    cardView.setVisibility(View.INVISIBLE);
-                    spinner.setVisibility(View.INVISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     emptyStateTextView.setText(t.getMessage());
@@ -144,19 +136,33 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
-            cardView.setVisibility(View.GONE);
-            spinner.setVisibility(View.GONE);
             emptyStateTextView.setText(R.string.no_internet_connection);
         }
 
     }
 
-    public Call<RootJsonData> createJsonDataCall(String category) {
+    public Call<RootJsonData> createJsonDataCall(String keyword) {
 
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
+
         Call<RootJsonData> rootJsonDataCall;
 
-        rootJsonDataCall = newsAPI.getTopHeadlinesByCategory(category, language, getString(R.string.API_KEY));
+        if (keyword.isEmpty()) {
+
+            if (isLocaleAvailable) {
+                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, getString(R.string.API_KEY));
+            } else {
+                if (isLanguageAvailable) {
+                    language = Utils.getLanguage();
+                } else {
+                    language = "en";
+                }
+                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, getString(R.string.API_KEY));
+
+            }
+        } else {
+            rootJsonDataCall = newsAPI.searchNewsByKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
+        }
 
         return rootJsonDataCall;
     }
@@ -178,23 +184,69 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         }
     }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        category = parent.getItemAtPosition(position).toString().toLowerCase();
-
+    public void searchKeyword(String query) {
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        fetchData(category);
+        keyword = query;
+        fetchData(keyword);
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        searchKeywordFromSearchView(menu);
 
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void searchKeywordFromSearchView(Menu menu) {
+        SearchManager searchManager = (SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setQueryHint("Search Latest News...");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.length() > 2) {
+                    searchKeyword(query);
+                } else {
+                    Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//                if (newText.length() % 2 == 0) {
+//                    searchKeyword(newText);
+//                }
+//                return true;
+                return false;
+            }
+        });
+
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                keyword = "";
+                return true;
+            }
+        });
+
+        searchMenuItem.getIcon().setVisible(false, false);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("category", category);
+        outState.putString("keyword", keyword);
     }
 }

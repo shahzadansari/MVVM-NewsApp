@@ -4,6 +4,10 @@ import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.news.fragments.ArticlesFragment;
+import com.example.news.fragments.FavoritesFragment;
+import com.example.news.fragments.HeadlinesFragment;
+import com.example.news.fragments.NewsFragment;
 import com.example.newsItem.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

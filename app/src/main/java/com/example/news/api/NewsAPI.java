@@ -24,6 +24,7 @@ public interface NewsAPI {
 
     @GET("top-headlines")
     Call<RootJsonData> searchNewsByKeyWord(@Query("q") String keyword,
+                                           @Query("sortBy") String sortBy,
                                            @Query("language") String language,
                                            @Query("apiKey") String apiKey);
 
