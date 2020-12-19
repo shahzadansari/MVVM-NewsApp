@@ -5,7 +5,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -62,13 +61,41 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Log.d(TAG, "onNavigationItemSelected: " + item.getItemId());
-                return true;
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            switch (id) {
+                case R.id.page_news:
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new NewsFragment())
+                            .setReorderingAllowed(true)
+                            .commit();
+                    break;
+                case R.id.page_headlines:
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new HeadlinesFragment())
+                            .setReorderingAllowed(true)
+                            .commit();
+                    break;
+                case R.id.page_articles:
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new ArticlesFragment())
+                            .setReorderingAllowed(true)
+                            .commit();
+                    break;
+                case R.id.page_favorites:
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new FavoritesFragment())
+                            .setReorderingAllowed(true)
+                            .commit();
+                    break;
+                default:
+                    break;
             }
-
+            return true;
         });
 
         locale = Utils.getCountry();
@@ -77,24 +104,24 @@ public class MainActivity extends AppCompatActivity {
         language = Locale.getDefault().getLanguage();
         isLanguageAvailable = Utils.checkLanguage(language);
 
-        mContext = this;
-        progressBar = findViewById(R.id.progress_circular);
-        emptyStateTextView = findViewById(R.id.empty_view);
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
-        textViewTitle = findViewById(R.id.text_view_top_headlines);
-
-        if (savedInstanceState != null) {
-            keyword = savedInstanceState.getString("keyword");
-        }
-
-        initEmptyRecyclerView();
-        fetchData(keyword);
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
+//        mContext = this;
+//        progressBar = findViewById(R.id.progress_circular);
+//        emptyStateTextView = findViewById(R.id.empty_view);
+//        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
+//        textViewTitle = findViewById(R.id.text_view_top_headlines);
+//
+//        if (savedInstanceState != null) {
+//            keyword = savedInstanceState.getString("keyword");
+//        }
+//
+//        initEmptyRecyclerView();
+//        fetchData(keyword);
+//        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
     }
 
     public void initEmptyRecyclerView() {
 
-        recyclerView = findViewById(R.id.recycler_view);
+//        recyclerView = findViewById(R.id.recycler_view);
         adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), this);
         recyclerView.setAdapter(adapter);
 

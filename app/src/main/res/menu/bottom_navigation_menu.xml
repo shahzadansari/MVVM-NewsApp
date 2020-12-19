@@ -3,12 +3,12 @@
     <item
         android:id="@+id/page_news"
         android:enabled="true"
-        android:icon="@drawable/news"
+        android:icon="@drawable/ic_news"
         android:title="News" />
     <item
         android:id="@+id/page_headlines"
         android:enabled="true"
-        android:icon="@drawable/headline"
+        android:icon="@drawable/ic_headlines"
         android:title="Headlines" />
 
     <item
