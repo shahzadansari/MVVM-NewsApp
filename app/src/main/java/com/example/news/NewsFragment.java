@@ -233,4 +233,10 @@ public class NewsFragment extends Fragment {
 
         searchMenuItem.getIcon().setVisible(false, false);
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("keyword", keyword);
+    }
 }

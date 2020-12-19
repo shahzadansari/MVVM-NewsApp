@@ -17,11 +17,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_container, new NewsFragment())
-                .setReorderingAllowed(true)
-                .commit();
+        if(savedInstanceState == null){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.fragment_container, new NewsFragment())
+                    .setReorderingAllowed(true)
+                    .commit();
+        }
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
