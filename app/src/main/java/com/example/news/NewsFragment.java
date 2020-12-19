@@ -1,15 +1,23 @@
 package com.example.news;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -75,6 +83,8 @@ public class NewsFragment extends Fragment {
         initEmptyRecyclerView();
         fetchData(keyword);
         swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
+
+        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -169,5 +179,58 @@ public class NewsFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
         keyword = query;
         fetchData(keyword);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_main, menu);
+        searchKeywordFromSearchView(menu);
+
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void searchKeywordFromSearchView(Menu menu) {
+        SearchManager searchManager = (SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+        searchView.setQueryHint("Search Latest News...");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                if (query.length() > 2) {
+                    searchKeyword(query);
+                } else {
+                    Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//                if (newText.length() % 2 == 0) {
+//                    searchKeyword(newText);
+//                }
+//                return true;
+                return false;
+            }
+        });
+
+        MenuItemCompat.setOnActionExpandListener(searchMenuItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                keyword = "";
+                return true;
+            }
+        });
+
+        searchMenuItem.getIcon().setVisible(false, false);
     }
 }
