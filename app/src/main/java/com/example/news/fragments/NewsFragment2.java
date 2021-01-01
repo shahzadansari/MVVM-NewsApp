@@ -20,21 +20,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.MainActivity;
-import com.example.news.adapters.NewsItemAdapter;
+import com.example.news.adapters.NewsItemAdapterV2;
 import com.example.news.models.NewsItem;
 import com.example.news.utils.Utils;
 import com.example.news.viewmodels.NewsViewModel;
 import com.example.newsItem.R;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class NewsFragment2 extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+    private NewsItemAdapterV2 adapter;
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private TextView textViewTitle;
@@ -68,6 +66,7 @@ public class NewsFragment2 extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
 
+
         locale = Utils.getCountry();
         isLocaleAvailable = Utils.checkLocale(locale);
 
@@ -80,6 +79,9 @@ public class NewsFragment2 extends Fragment {
         swipeRefreshLayout = rootView.findViewById(R.id.swipe_refresh);
         textViewTitle = rootView.findViewById(R.id.text_view_top_headlines);
         recyclerView = rootView.findViewById(R.id.recycler_view);
+
+        adapter = new NewsItemAdapterV2(mContext);
+
 
         if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
@@ -97,9 +99,9 @@ public class NewsFragment2 extends Fragment {
                     textViewTitle.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     newsItemList = newsItems;
-                    adapter = new NewsItemAdapter(mContext, newsItemList, (MainActivity) getActivity());
+//                    adapter = new NewsItemAdapterV2(mContext);
                     recyclerView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
+                    adapter.submitList(newsItemList);
                 } else {
                     Log.d(TAG, "onChanged: newsItems: null");
                     emptyStateTextView.setText(R.string.no_news_found);
@@ -132,7 +134,7 @@ public class NewsFragment2 extends Fragment {
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), (MainActivity) getActivity());
+        adapter = new NewsItemAdapterV2(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
