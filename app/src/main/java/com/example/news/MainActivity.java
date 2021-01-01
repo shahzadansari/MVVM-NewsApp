@@ -8,6 +8,7 @@ import com.example.news.fragments.ArticlesFragment;
 import com.example.news.fragments.FavoritesFragment;
 import com.example.news.fragments.HeadlinesFragment;
 import com.example.news.fragments.NewsFragment;
+import com.example.news.fragments.NewsFragment2;
 import com.example.newsItem.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -58,6 +59,13 @@ public class MainActivity extends AppCompatActivity {
                     getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.fragment_container, new FavoritesFragment())
+                            .setReorderingAllowed(true)
+                            .commit();
+                    break;
+                case R.id.page_news_v2:
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.fragment_container, new NewsFragment2())
                             .setReorderingAllowed(true)
                             .commit();
                     break;
