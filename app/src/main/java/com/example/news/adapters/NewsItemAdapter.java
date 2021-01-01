@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
 
     private Context mContext;
     private List<NewsItem> newsItemList;
+    private static final String TAG = "NewsItemAdapter";
 
     // For transition animation
     private MainActivity main_activity;
@@ -88,6 +90,7 @@ public class NewsItemAdapter extends RecyclerView.Adapter<NewsItemAdapter.ViewHo
         holder.textViewDescription.setText(newsItemList.get(position).getDescription());
         holder.textViewSource.setText(newsItemList.get(position).getSource().getName());
         holder.textViewTime.setText(" \u2022 " + Utils.DateToTimeFormat(newsItemList.get(position).getPublishedAt()));
+        Log.d(TAG, "onChanged: called");
         holder.textViewPublishedAt.setText(Utils.DateFormat(newsItemList.get(position).getPublishedAt()));
         holder.textViewAuthor.setText(newsItemList.get(position).getAuthor());
     }
