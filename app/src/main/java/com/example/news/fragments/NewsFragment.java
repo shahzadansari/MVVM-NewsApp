@@ -24,8 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.MainActivity;
-import com.example.news.adapters.NewsItemAdapter;
+import com.example.news.adapters.NewsItemAdapterV2;
 import com.example.news.api.NewsAPI;
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
@@ -33,7 +32,6 @@ import com.example.news.utils.ServiceGenerator;
 import com.example.news.utils.Utils;
 import com.example.newsItem.R;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,7 +42,7 @@ import retrofit2.Response;
 public class NewsFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+    private NewsItemAdapterV2 adapter;
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private TextView textViewTitle;
@@ -90,17 +88,21 @@ public class NewsFragment extends Fragment {
             keyword = savedInstanceState.getString("keyword");
         }
 
+//        adapter = new NewsItemAdapterV2(mContext);
         initEmptyRecyclerView();
         fetchData(keyword);
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            initEmptyRecyclerView();
+            fetchData(keyword);
+        });
 
         setHasOptionsMenu(true);
         return rootView;
     }
 
     public void initEmptyRecyclerView() {
-
-        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), (MainActivity) getActivity());
+        adapter = new NewsItemAdapterV2(mContext);
+//        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), (MainActivity) getActivity());
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -174,18 +176,23 @@ public class NewsFragment extends Fragment {
 
         progressBar.setVisibility(View.GONE);
         if (newsItemList.isEmpty()) {
+            adapter.submitList(newsItemList);
+            textViewTitle.setVisibility(View.INVISIBLE);
+            emptyStateTextView.setVisibility(View.VISIBLE);
             emptyStateTextView.setText(R.string.no_news_found);
         }
 
         if (!newsItemList.isEmpty()) {
-            adapter = new NewsItemAdapter(mContext, newsItemList, (MainActivity) getActivity());
-            recyclerView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
+            textViewTitle.setVisibility(View.VISIBLE);
+            adapter = new NewsItemAdapterV2(mContext);
+            initEmptyRecyclerView();
+            adapter.submitList(newsItemList);
+            emptyStateTextView.setVisibility(View.INVISIBLE);
         }
     }
 
     public void searchKeyword(String query) {
-        initEmptyRecyclerView();
+//        initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
         keyword = query;
         fetchData(keyword);
