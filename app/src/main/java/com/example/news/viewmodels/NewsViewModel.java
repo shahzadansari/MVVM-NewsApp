@@ -7,8 +7,10 @@ import com.example.news.api.NewsAPI;
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
 import com.example.news.utils.ServiceGenerator;
+import com.example.news.utils.Utils;
 
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -17,15 +19,11 @@ import retrofit2.Response;
 public class NewsViewModel extends ViewModel {
 
     private MutableLiveData<List<NewsItem>> newsItems;
+    public static final String SORT_ORDER = "publishedAt";
 
     public NewsViewModel() {
         newsItems = new MutableLiveData<>();
     }
-
-    //    public NewsViewModel(@NonNull Application application) {
-//        super(application);
-//        newsItems = new MutableLiveData<>();
-//    }
 
     public MutableLiveData<List<NewsItem>> getNewsItemListObserver() {
         return newsItems;
@@ -49,27 +47,31 @@ public class NewsViewModel extends ViewModel {
 
     private Call<RootJsonData> createJsonDataCall(String keyword, String apiKey) {
 
+        String locale = Utils.getCountry();
+        boolean isLocaleAvailable = Utils.checkLocale(locale);
+
+        String language = Locale.getDefault().getLanguage();
+        boolean isLanguageAvailable = Utils.checkLanguage(language);
+
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-
         Call<RootJsonData> rootJsonDataCall;
-        rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage("en", apiKey);
 
-//        if (keyword.isEmpty()) {
-//
-//            if (isLocaleAvailable) {
-//                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, getString(R.string.API_KEY));
-//            } else {
-//                if (isLanguageAvailable) {
-//                    language = Utils.getLanguage();
-//                } else {
-//                    language = "en";
-//                }
-//                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, getString(R.string.API_KEY));
-//
-//            }
-//        } else {
-//            rootJsonDataCall = newsAPI.searchNewsByKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
-//        }
+        if (keyword.isEmpty()) {
+
+            if (isLocaleAvailable) {
+                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, apiKey);
+            } else {
+                if (isLanguageAvailable) {
+                    language = Utils.getLanguage();
+                } else {
+                    language = "en";
+                }
+
+                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, apiKey);
+            }
+        } else {
+            rootJsonDataCall = newsAPI.searchNewsByKeyWord(keyword, SORT_ORDER, language, apiKey);
+        }
 
         return rootJsonDataCall;
     }
