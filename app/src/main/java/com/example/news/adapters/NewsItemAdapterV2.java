@@ -1,10 +1,10 @@
 package com.example.news.adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,19 +28,14 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
-import com.example.news.MainActivity;
 import com.example.news.NewsDetailActivity;
 import com.example.news.models.NewsItem;
 import com.example.news.utils.Utils;
 import com.example.newsItem.R;
 
-import java.util.List;
-
 public class NewsItemAdapterV2 extends ListAdapter<NewsItem, NewsItemAdapterV2.ViewHolder> {
 
     private Context mContext;
-    private List<NewsItem> newsItemList;
-    private static final String TAG = "NewsItemAdapter";
 
     private static final DiffUtil.ItemCallback<NewsItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<NewsItem>() {
         @Override
@@ -62,19 +57,11 @@ public class NewsItemAdapterV2 extends ListAdapter<NewsItem, NewsItemAdapterV2.V
         }
     };
 
-    // For transition animation
-    private MainActivity main_activity;
 
     public NewsItemAdapterV2(Context context) {
         super(DIFF_CALLBACK);
         mContext = context;
     }
-
-//    public NewsItemAdapterV2(Context mContext, List<NewsItem> newsItemList, MainActivity mainActivity) {
-//        this.mContext = mContext;
-//        this.newsItemList = newsItemList;
-//        this.main_activity = mainActivity;
-//    }
 
     @NonNull
     @Override
@@ -119,7 +106,6 @@ public class NewsItemAdapterV2 extends ListAdapter<NewsItem, NewsItemAdapterV2.V
         holder.textViewDescription.setText(newsItem.getDescription());
         holder.textViewSource.setText(newsItem.getSource().getName());
         holder.textViewTime.setText(" \u2022 " + Utils.DateToTimeFormat(newsItem.getPublishedAt()));
-        Log.d(TAG, "onChanged: called");
         holder.textViewPublishedAt.setText(Utils.DateFormat(newsItem.getPublishedAt()));
         holder.textViewAuthor.setText(newsItem.getAuthor());
     }
@@ -152,18 +138,19 @@ public class NewsItemAdapterV2 extends ListAdapter<NewsItem, NewsItemAdapterV2.V
         @Override
         public void onClick(View view) {
 
-            Intent intent = new Intent(mContext, NewsDetailActivity.class);
-
             int position = getAdapterPosition();
-            intent.putExtra("url", newsItemList.get(position).getUrl());
-            intent.putExtra("title", newsItemList.get(position).getTitle());
-            intent.putExtra("urlToImage", newsItemList.get(position).getUrlToImage());
-            intent.putExtra("date", newsItemList.get(position).getPublishedAt());
-            intent.putExtra("source", newsItemList.get(position).getSource().getName());
-            intent.putExtra("author", newsItemList.get(position).getAuthor());
+            NewsItem newsItem = getItem(position);
+
+            Intent intent = new Intent(mContext, NewsDetailActivity.class);
+            intent.putExtra("url", newsItem.getUrl());
+            intent.putExtra("title", newsItem.getTitle());
+            intent.putExtra("urlToImage", newsItem.getUrlToImage());
+            intent.putExtra("date", newsItem.getPublishedAt());
+            intent.putExtra("source", newsItem.getSource().getName());
+            intent.putExtra("author", newsItem.getAuthor());
 
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation
-                    (main_activity, titleImage, ViewCompat.getTransitionName(titleImage));
+                    ((Activity) mContext, titleImage, ViewCompat.getTransitionName(titleImage));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                 mContext.startActivity(intent, options.toBundle());
@@ -172,5 +159,4 @@ public class NewsItemAdapterV2 extends ListAdapter<NewsItem, NewsItemAdapterV2.V
             }
         }
     }
-
 }
