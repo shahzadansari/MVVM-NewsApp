@@ -20,35 +20,42 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.news.adapters.NewsItemAdapterV2;
+import com.example.news.api.NewsAPI;
 import com.example.news.models.NewsItem;
-import com.example.news.viewmodels.NewsViewModel;
+import com.example.news.models.RootJsonData;
+import com.example.news.utils.ServiceGenerator;
+import com.example.news.utils.Utils;
 import com.example.newsItem.R;
 
 import java.util.List;
+import java.util.Locale;
 
-public class NewsFragment extends Fragment {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class NewsFragmentV1 extends Fragment {
 
     private RecyclerView recyclerView;
     private NewsItemAdapterV2 adapter;
-
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private TextView textViewTitle;
-
     private Context mContext;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private String keyword = "";
+    private SwipeRefreshLayout swipeRefreshLayout;
+    public static final String SORT_ORDER = "publishedAt";
+    private String language = "";
+    private String locale = "";
+    private boolean isLanguageAvailable = false;
+    private boolean isLocaleAvailable = false;
 
-    private NewsViewModel mNewsViewModel;
-
-    public NewsFragment() {
+    public NewsFragmentV1() {
         // Required empty public constructor
     }
 
@@ -64,6 +71,12 @@ public class NewsFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_news, container, false);
 
+        locale = Utils.getCountry();
+        isLocaleAvailable = Utils.checkLocale(locale);
+
+        language = Locale.getDefault().getLanguage();
+        isLanguageAvailable = Utils.checkLanguage(language);
+
         mContext = getActivity();
         progressBar = rootView.findViewById(R.id.progress_circular);
         emptyStateTextView = rootView.findViewById(R.id.empty_view);
@@ -71,58 +84,16 @@ public class NewsFragment extends Fragment {
         textViewTitle = rootView.findViewById(R.id.text_view_top_headlines);
         recyclerView = rootView.findViewById(R.id.recycler_view);
 
-        adapter = new NewsItemAdapterV2(mContext);
-
-
         if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
         }
 
+//        adapter = new NewsItemAdapterV2(mContext);
         initEmptyRecyclerView();
-
-        mNewsViewModel = ViewModelProviders.of(this).get(NewsViewModel.class);
-        mNewsViewModel.getNewsItemListObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
-            @Override
-            public void onChanged(List<NewsItem> newsItems) {
-                progressBar.setVisibility(View.GONE);
-
-                if (!newsItems.isEmpty()) {
-                    recyclerView.setAdapter(adapter);
-
-                    emptyStateTextView.setVisibility(View.INVISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    textViewTitle.setVisibility(View.VISIBLE);
-                    adapter.submitList(newsItems);
-                }
-
-                if (newsItems.isEmpty()) {
-                    initEmptyRecyclerView();
-
-                    adapter.submitList(newsItems);
-                    textViewTitle.setVisibility(View.INVISIBLE);
-                    emptyStateTextView.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    emptyStateTextView.setText(R.string.no_news_found);
-                }
-
-            }
-        });
-
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        if (networkInfo != null && networkInfo.isConnected()) {
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
-        } else {
-            progressBar.setVisibility(View.GONE);
-            textViewTitle.setVisibility(View.GONE);
-            emptyStateTextView.setText(R.string.no_internet_connection);
-        }
-
+        fetchData(keyword);
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            fetchData(keyword);
         });
 
         setHasOptionsMenu(true);
@@ -130,8 +101,8 @@ public class NewsFragment extends Fragment {
     }
 
     public void initEmptyRecyclerView() {
-
         adapter = new NewsItemAdapterV2(mContext);
+//        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), (MainActivity) getActivity());
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -140,10 +111,98 @@ public class NewsFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
+    public void fetchData(String keyword) {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+
+            Call<RootJsonData> rootJsonDataCall = createJsonDataCall(keyword);
+            rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
+                @Override
+                public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
+                    textViewTitle.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                    initRecyclerViewWithResponseData(response);
+                }
+
+                @Override
+                public void onFailure(Call<RootJsonData> call, Throwable t) {
+                    textViewTitle.setVisibility(View.INVISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                    emptyStateTextView.setText(t.getMessage());
+                }
+            });
+
+        } else {
+            progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.GONE);
+            emptyStateTextView.setText(R.string.no_internet_connection);
+        }
+
+    }
+
+    public Call<RootJsonData> createJsonDataCall(String keyword) {
+
+        NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
+
+        Call<RootJsonData> rootJsonDataCall;
+
+        if (keyword.isEmpty()) {
+
+            if (isLocaleAvailable) {
+                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, getString(R.string.API_KEY_2));
+            } else {
+                if (isLanguageAvailable) {
+                    language = Utils.getLanguage();
+                } else {
+                    language = "en";
+                }
+                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, getString(R.string.API_KEY_2));
+
+            }
+        } else {
+            rootJsonDataCall = newsAPI.searchNewsByKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY_2));
+        }
+
+        return rootJsonDataCall;
+    }
+
+    public void initRecyclerViewWithResponseData(Response<RootJsonData> response) {
+
+        RootJsonData rootJsonData = response.body();
+        List<NewsItem> newsItemList = rootJsonData.getNewsItems();
+
+        progressBar.setVisibility(View.GONE);
+        if (newsItemList.isEmpty()) {
+            adapter.submitList(newsItemList);
+            textViewTitle.setVisibility(View.INVISIBLE);
+            emptyStateTextView.setVisibility(View.VISIBLE);
+            emptyStateTextView.setText(R.string.no_news_found);
+        }
+
+        if (!newsItemList.isEmpty()) {
+            textViewTitle.setVisibility(View.VISIBLE);
+            adapter = new NewsItemAdapterV2(mContext);
+            initEmptyRecyclerView();
+            adapter.submitList(newsItemList);
+            emptyStateTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    public void searchKeyword(String query) {
+//        initEmptyRecyclerView();
+        progressBar.setVisibility(View.VISIBLE);
+        keyword = query;
+        fetchData(keyword);
+    }
+
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
         searchKeywordFromSearchView(menu);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -159,11 +218,7 @@ public class NewsFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2) {
-                    keyword = query;
-                    initEmptyRecyclerView();
-                    progressBar.setVisibility(View.VISIBLE);
-                    textViewTitle.setVisibility(View.INVISIBLE);
-                    mNewsViewModel.fetchData(query, getString(R.string.API_KEY_2));
+                    searchKeyword(query);
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }
@@ -172,6 +227,10 @@ public class NewsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+//                if (newText.length() % 2 == 0) {
+//                    searchKeyword(newText);
+//                }
+//                return true;
                 return false;
             }
         });
@@ -191,7 +250,6 @@ public class NewsFragment extends Fragment {
 
         searchMenuItem.getIcon().setVisible(false, false);
     }
-
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

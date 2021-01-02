@@ -23,9 +23,4 @@
         android:icon="@drawable/ic_favorite"
         android:title="Favorites" />
 
-    <item
-        android:id="@+id/page_news_v2"
-        android:enabled="true"
-        android:icon="@drawable/ic_news"
-        android:title="News2.0" />
 </menu>
