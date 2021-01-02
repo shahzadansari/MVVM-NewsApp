@@ -73,7 +73,6 @@ public class NewsFragment extends Fragment {
 
         adapter = new NewsItemAdapterV2(mContext);
 
-
         if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
         }
@@ -81,6 +80,34 @@ public class NewsFragment extends Fragment {
         initEmptyRecyclerView();
 
         mNewsViewModel = ViewModelProviders.of(this).get(NewsViewModel.class);
+        subscribeObservers();
+
+        fetchData();
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            initEmptyRecyclerView();
+            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+        });
+
+        setHasOptionsMenu(true);
+        return rootView;
+    }
+
+    private void fetchData() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+        } else {
+            progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.GONE);
+            emptyStateTextView.setText(R.string.no_internet_connection);
+        }
+    }
+
+    private void subscribeObservers() {
         mNewsViewModel.getNewsItemListObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
             @Override
             public void onChanged(List<NewsItem> newsItems) {
@@ -107,26 +134,6 @@ public class NewsFragment extends Fragment {
 
             }
         });
-
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        if (networkInfo != null && networkInfo.isConnected()) {
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
-        } else {
-            progressBar.setVisibility(View.GONE);
-            textViewTitle.setVisibility(View.GONE);
-            emptyStateTextView.setText(R.string.no_internet_connection);
-        }
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            initEmptyRecyclerView();
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
-        });
-
-        setHasOptionsMenu(true);
-        return rootView;
     }
 
     public void initEmptyRecyclerView() {
