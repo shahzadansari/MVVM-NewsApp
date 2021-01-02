@@ -3,7 +3,7 @@ package com.example.news.async;
 import android.os.AsyncTask;
 
 import com.example.news.models.NewsItem;
-import com.example.news.persistence.ArticleDao;
+import com.example.news.data.persistence.ArticleDao;
 
 public class DeleteNoteAsyncTask extends AsyncTask<NewsItem, Void, Void> {
 

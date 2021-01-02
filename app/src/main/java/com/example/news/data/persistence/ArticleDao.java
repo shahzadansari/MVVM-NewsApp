@@ -1,4 +1,4 @@
-package com.example.news.persistence;
+package com.example.news.data.persistence;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -17,7 +17,7 @@ public interface ArticleDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(NewsItem article);
 
-    @Query("SELECT * FROM saved_articles")
+    @Query("SELECT * FROM saved_articles ORDER BY id DESC")
     LiveData<List<NewsItem>> getAllSavedArticles();
 
     @Delete

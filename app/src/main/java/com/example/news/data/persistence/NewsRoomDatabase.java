@@ -1,15 +1,12 @@
-package com.example.news.persistence;
+package com.example.news.data.persistence;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
-import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.example.news.async.PopulateDbAsyncTask;
 import com.example.news.models.NewsItem;
 
 @Database(entities = {NewsItem.class}, version = 1, exportSchema = false)
@@ -27,7 +24,7 @@ public abstract class NewsRoomDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             NewsRoomDatabase.class, "news_db")
-                            .addCallback(sRoomDatabaseCallback)
+//                            .addCallback(sRoomDatabaseCallback)
                             .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -37,11 +34,11 @@ public abstract class NewsRoomDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    private static Callback sRoomDatabaseCallback = new Callback() {
-        @Override
-        public void onCreate(@NonNull SupportSQLiteDatabase db) {
-            super.onCreate(db);
-            new PopulateDbAsyncTask(INSTANCE).execute();
-        }
-    };
+//    private static Callback sRoomDatabaseCallback = new Callback() {
+//        @Override
+//        public void onCreate(@NonNull SupportSQLiteDatabase db) {
+//            super.onCreate(db);
+//            new PopulateDbAsyncTask(INSTANCE).execute();
+//        }
+//    };
 }

@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.news.adapters.NewsItemAdapterV2;
+import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.viewmodels.FavoritesViewModel;
 import com.example.newsItem.R;
@@ -26,10 +26,12 @@ public class FavoritesFragment extends Fragment {
     private TextView textViewTitle;
 
     private RecyclerView recyclerView;
-    private NewsItemAdapterV2 adapter;
+    private NewsItemAdapter adapter;
     private Context mContext;
 
     private FavoritesViewModel mFavoritesViewModel;
+    
+    //TODO: Add delete articles on swipe
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -52,7 +54,7 @@ public class FavoritesFragment extends Fragment {
         emptyStateTextView = rootView.findViewById(R.id.empty_view);
         textViewTitle = rootView.findViewById(R.id.text_view_top_headlines);
         recyclerView = rootView.findViewById(R.id.recycler_view);
-        adapter = new NewsItemAdapterV2(mContext);
+        adapter = new NewsItemAdapter(mContext);
         initEmptyRecyclerView();
 
         mFavoritesViewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);

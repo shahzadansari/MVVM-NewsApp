@@ -7,9 +7,9 @@ import androidx.lifecycle.LiveData;
 import com.example.news.async.DeleteAllNotesAsyncTask;
 import com.example.news.async.DeleteNoteAsyncTask;
 import com.example.news.async.InsertNoteAsyncTask;
+import com.example.news.data.persistence.ArticleDao;
+import com.example.news.data.persistence.NewsRoomDatabase;
 import com.example.news.models.NewsItem;
-import com.example.news.persistence.ArticleDao;
-import com.example.news.persistence.NewsRoomDatabase;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.example.news.persistence;
+package com.example.news.data.persistence;
 
 import androidx.room.TypeConverter;
 

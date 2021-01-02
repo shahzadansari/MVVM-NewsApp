@@ -3,10 +3,10 @@ package com.example.news.viewmodels;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.news.api.NewsAPI;
+import com.example.news.data.remote.ServiceGenerator;
+import com.example.news.data.remote.api.NewsAPI;
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
-import com.example.news.utils.ServiceGenerator;
 import com.example.news.utils.Utils;
 
 import java.util.List;

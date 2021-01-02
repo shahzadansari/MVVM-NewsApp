@@ -4,8 +4,8 @@ import android.os.AsyncTask;
 
 import com.example.news.models.NewsItem;
 import com.example.news.models.Source;
-import com.example.news.persistence.ArticleDao;
-import com.example.news.persistence.NewsRoomDatabase;
+import com.example.news.data.persistence.ArticleDao;
+import com.example.news.data.persistence.NewsRoomDatabase;
 
 
 public class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void> {
