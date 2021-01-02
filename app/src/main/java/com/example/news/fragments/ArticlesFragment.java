@@ -19,54 +19,44 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.MainActivity;
-import com.example.news.adapters.NewsItemAdapter;
-import com.example.news.api.NewsAPI;
+import com.example.news.adapters.NewsItemAdapterV2;
 import com.example.news.models.NewsItem;
-import com.example.news.models.RootJsonData;
-import com.example.news.utils.ServiceGenerator;
-import com.example.news.utils.Utils;
+import com.example.news.viewmodels.ArticlesViewModel;
 import com.example.newsItem.R;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ArticlesFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+    private NewsItemAdapterV2 adapter;
+
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private TextView textViewTitle;
+
     private Context mContext;
-    private String keyword = "";
     private SwipeRefreshLayout swipeRefreshLayout;
-    public static final String SORT_ORDER = "popularity";
-    private String language = "";
-    private boolean isLanguageAvailable = false;
+    private String keyword = "";
+
+    private ArticlesViewModel mArticlesViewModel;
+
+    public ArticlesFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        language = Locale.getDefault().getLanguage();
-        isLanguageAvailable = Utils.checkLanguage(language);
-        if (isLanguageAvailable) {
-            language = Utils.getLanguage();
-        } else {
-            language = "en";
-        }
-        keyword = "news";
-
         getActivity().setTitle("Articles");
+        keyword = "news";
     }
 
     @Override
@@ -87,17 +77,68 @@ public class ArticlesFragment extends Fragment {
         }
 
         initEmptyRecyclerView();
-        fetchData(keyword);
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(keyword));
+
+        mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+        subscribeObservers();
+
+        fetchData();
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            initEmptyRecyclerView();
+            mArticlesViewModel.fetchData(keyword, getString(R.string.API_KEY));
+        });
 
         setHasOptionsMenu(true);
-
         return rootView;
+    }
+
+    private void fetchData() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            mArticlesViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+        } else {
+            progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.GONE);
+            emptyStateTextView.setText(R.string.no_internet_connection);
+        }
+    }
+
+    private void subscribeObservers() {
+        mArticlesViewModel.getArticlesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
+            @Override
+            public void onChanged(List<NewsItem> newsItems) {
+                progressBar.setVisibility(View.GONE);
+
+                if (!newsItems.isEmpty()) {
+                    initEmptyRecyclerView();
+                    adapter.submitList(newsItems);
+
+                    emptyStateTextView.setVisibility(View.INVISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                    textViewTitle.setVisibility(View.VISIBLE);
+
+                }
+
+                if (newsItems.isEmpty()) {
+                    initEmptyRecyclerView();
+
+                    adapter.submitList(newsItems);
+                    textViewTitle.setVisibility(View.INVISIBLE);
+                    emptyStateTextView.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                    emptyStateTextView.setText(R.string.no_news_found);
+                }
+
+            }
+        });
     }
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), (MainActivity) getActivity());
+        adapter = new NewsItemAdapterV2(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -106,78 +147,10 @@ public class ArticlesFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
-    public void fetchData(String keyword) {
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        if (networkInfo != null && networkInfo.isConnected()) {
-
-            Call<RootJsonData> rootJsonDataCall = createJsonDataCall(keyword);
-            rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
-                @Override
-                public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
-                    textViewTitle.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    initRecyclerViewWithResponseData(response);
-                }
-
-                @Override
-                public void onFailure(Call<RootJsonData> call, Throwable t) {
-                    textViewTitle.setVisibility(View.INVISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    emptyStateTextView.setText(t.getMessage());
-                }
-            });
-
-        } else {
-            progressBar.setVisibility(View.GONE);
-            textViewTitle.setVisibility(View.GONE);
-            emptyStateTextView.setText(R.string.no_internet_connection);
-        }
-
-    }
-
-    public Call<RootJsonData> createJsonDataCall(String keyword) {
-
-        NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-
-        Call<RootJsonData> rootJsonDataCall;
-
-        rootJsonDataCall = newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, getString(R.string.API_KEY));
-
-        return rootJsonDataCall;
-    }
-
-    public void initRecyclerViewWithResponseData(Response<RootJsonData> response) {
-
-        RootJsonData rootJsonData = response.body();
-        List<NewsItem> newsItemList = rootJsonData.getNewsItems();
-
-        progressBar.setVisibility(View.GONE);
-        if (newsItemList.isEmpty()) {
-            emptyStateTextView.setText(R.string.no_news_found);
-        }
-
-        if (!newsItemList.isEmpty()) {
-            adapter = new NewsItemAdapter(mContext, newsItemList, (MainActivity) getActivity());
-            recyclerView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    public void searchKeyword(String query) {
-        initEmptyRecyclerView();
-        progressBar.setVisibility(View.VISIBLE);
-        keyword = query;
-        fetchData(keyword);
-    }
-
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_main, menu);
         searchKeywordFromSearchView(menu);
-
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -193,7 +166,11 @@ public class ArticlesFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2) {
-                    searchKeyword(query);
+                    keyword = query;
+                    initEmptyRecyclerView();
+                    progressBar.setVisibility(View.VISIBLE);
+                    textViewTitle.setVisibility(View.INVISIBLE);
+                    mArticlesViewModel.fetchData(query, getString(R.string.API_KEY));
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }
@@ -214,7 +191,7 @@ public class ArticlesFragment extends Fragment {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                keyword = "";
+                keyword = "news";
                 return true;
             }
         });

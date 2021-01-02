@@ -14,62 +14,48 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.MainActivity;
-import com.example.news.adapters.NewsItemAdapter;
-import com.example.news.api.NewsAPI;
+import com.example.news.adapters.NewsItemAdapterV2;
 import com.example.news.models.NewsItem;
-import com.example.news.models.RootJsonData;
-import com.example.news.utils.ServiceGenerator;
-import com.example.news.utils.Utils;
+import com.example.news.viewmodels.HeadlinesViewModel;
 import com.example.newsItem.R;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+    private NewsItemAdapterV2 adapter;
+
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
     private TextView textViewTitle;
+
     private Context mContext;
-    private String category = "";
     private SwipeRefreshLayout swipeRefreshLayout;
-    private String language = "";
-    private boolean isLanguageAvailable = false;
+    private String category = "";
+
     private Spinner spinner;
     private CardView cardView;
+
+    private HeadlinesViewModel mHeadlinesViewModel;
 
     public HeadlinesFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        language = Locale.getDefault().getLanguage();
-        isLanguageAvailable = Utils.checkLanguage(language);
-        if (isLanguageAvailable) {
-            language = Utils.getLanguage();
-        } else {
-            language = "en";
-        }
-        category = "business";
-
         getActivity().setTitle("Headlines");
+        category = "business";
     }
 
     @Override
@@ -77,6 +63,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_headlines, container, false);
+
         mContext = getActivity();
         progressBar = rootView.findViewById(R.id.progress_circular);
         emptyStateTextView = rootView.findViewById(R.id.empty_view);
@@ -86,6 +73,75 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         spinner = rootView.findViewById(R.id.spinner_category);
         cardView = rootView.findViewById(R.id.card_view);
 
+        adapter = new NewsItemAdapterV2(mContext);
+
+        initSpinner();
+        initEmptyRecyclerView();
+
+        if (savedInstanceState != null) {
+            category = savedInstanceState.getString("category");
+        }
+
+        mHeadlinesViewModel = ViewModelProviders.of(this).get(HeadlinesViewModel.class);
+        subscribeObservers();
+
+        fetchData();
+
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            initEmptyRecyclerView();
+            mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY_2));
+        });
+
+        return rootView;
+    }
+
+    private void fetchData() {
+        ConnectivityManager connectivityManager = (ConnectivityManager)
+                getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if (networkInfo != null && networkInfo.isConnected()) {
+            mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY));
+        } else {
+            progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.GONE);
+            emptyStateTextView.setText(R.string.no_internet_connection);
+        }
+    }
+
+    private void subscribeObservers() {
+        mHeadlinesViewModel.getHeadlinesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
+            @Override
+            public void onChanged(List<NewsItem> newsItems) {
+                progressBar.setVisibility(View.GONE);
+
+                if (!newsItems.isEmpty()) {
+                    initEmptyRecyclerView();
+                    adapter.submitList(newsItems);
+
+                    cardView.setVisibility(View.VISIBLE);
+                    spinner.setVisibility(View.VISIBLE);
+                    emptyStateTextView.setVisibility(View.INVISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                    textViewTitle.setVisibility(View.VISIBLE);
+                }
+
+                if (newsItems.isEmpty()) {
+                    initEmptyRecyclerView();
+                    adapter.submitList(newsItems);
+
+                    cardView.setVisibility(View.INVISIBLE);
+                    spinner.setVisibility(View.INVISIBLE);
+                    textViewTitle.setVisibility(View.INVISIBLE);
+                    emptyStateTextView.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
+                    emptyStateTextView.setText(R.string.no_news_found);
+                }
+            }
+        });
+    }
+
+    private void initSpinner() {
         spinner.setOnItemSelectedListener(this);
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mContext,
@@ -96,20 +152,11 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
-
-        if (savedInstanceState != null) {
-            category = savedInstanceState.getString("category");
-        }
-
-        initEmptyRecyclerView();
-        fetchData(category);
-        swipeRefreshLayout.setOnRefreshListener(() -> fetchData(category));
-        return rootView;
     }
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapter(mContext, new ArrayList<NewsItem>(), (MainActivity) getActivity());
+        adapter = new NewsItemAdapterV2(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -118,78 +165,12 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
-    public void fetchData(String category) {
-        ConnectivityManager connectivityManager = (ConnectivityManager)
-                mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
-
-        if (networkInfo != null && networkInfo.isConnected()) {
-
-            Call<RootJsonData> rootJsonDataCall = createJsonDataCall(category);
-            rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
-                @Override
-                public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
-                    cardView.setVisibility(View.VISIBLE);
-                    spinner.setVisibility(View.VISIBLE);
-                    textViewTitle.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    initRecyclerViewWithResponseData(response);
-                }
-
-                @Override
-                public void onFailure(Call<RootJsonData> call, Throwable t) {
-                    cardView.setVisibility(View.INVISIBLE);
-                    spinner.setVisibility(View.INVISIBLE);
-                    textViewTitle.setVisibility(View.INVISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    emptyStateTextView.setText(t.getMessage());
-                }
-            });
-
-        } else {
-            progressBar.setVisibility(View.GONE);
-            textViewTitle.setVisibility(View.GONE);
-            cardView.setVisibility(View.GONE);
-            spinner.setVisibility(View.GONE);
-            emptyStateTextView.setText(R.string.no_internet_connection);
-        }
-
-    }
-
-    public Call<RootJsonData> createJsonDataCall(String category) {
-
-        NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> rootJsonDataCall;
-
-        rootJsonDataCall = newsAPI.getTopHeadlinesByCategory(category, language, getString(R.string.API_KEY));
-
-        return rootJsonDataCall;
-    }
-
-    public void initRecyclerViewWithResponseData(Response<RootJsonData> response) {
-
-        RootJsonData rootJsonData = response.body();
-        List<NewsItem> newsItemList = rootJsonData.getNewsItems();
-
-        progressBar.setVisibility(View.GONE);
-        if (newsItemList.isEmpty()) {
-            emptyStateTextView.setText(R.string.no_news_found);
-        }
-
-        if (!newsItemList.isEmpty()) {
-            adapter = new NewsItemAdapter(mContext, newsItemList, (MainActivity) getActivity());
-            recyclerView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         category = parent.getItemAtPosition(position).toString().toLowerCase();
-
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        fetchData(category);
+        mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY_2));
     }
 
     @Override
