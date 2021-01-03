@@ -1,4 +1,4 @@
-package com.example.news.data.persistence;
+package com.example.news.data.local;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;

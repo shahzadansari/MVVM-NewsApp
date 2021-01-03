@@ -89,7 +89,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY_2));
+            mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY_2));
         });
 
         return rootView;
@@ -101,7 +101,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY));
+            mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY));
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -170,7 +170,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         category = parent.getItemAtPosition(position).toString().toLowerCase();
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY_2));
+        mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY_2));
     }
 
     @Override

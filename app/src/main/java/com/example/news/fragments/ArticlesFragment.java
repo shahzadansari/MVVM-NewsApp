@@ -85,7 +85,7 @@ public class ArticlesFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mArticlesViewModel.fetchData(keyword, getString(R.string.API_KEY));
+            mArticlesViewModel.getArticles(keyword, getString(R.string.API_KEY));
         });
 
         setHasOptionsMenu(true);
@@ -98,7 +98,7 @@ public class ArticlesFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mArticlesViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            mArticlesViewModel.getArticles(keyword, getString(R.string.API_KEY_2));
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -170,7 +170,7 @@ public class ArticlesFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mArticlesViewModel.fetchData(query, getString(R.string.API_KEY));
+                    mArticlesViewModel.getArticles(query, getString(R.string.API_KEY));
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }

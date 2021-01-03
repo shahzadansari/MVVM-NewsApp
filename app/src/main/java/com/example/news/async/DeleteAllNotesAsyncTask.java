@@ -2,7 +2,7 @@ package com.example.news.async;
 
 import android.os.AsyncTask;
 
-import com.example.news.data.persistence.ArticleDao;
+import com.example.news.data.local.ArticleDao;
 
 public class DeleteAllNotesAsyncTask extends AsyncTask<Void, Void, Void> {
 

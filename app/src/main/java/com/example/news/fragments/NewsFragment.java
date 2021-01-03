@@ -86,7 +86,7 @@ public class NewsFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            mNewsViewModel.getNews(keyword, getString(R.string.API_KEY_2));
         });
 
         setHasOptionsMenu(true);
@@ -99,7 +99,7 @@ public class NewsFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            mNewsViewModel.getNews(keyword, getString(R.string.API_KEY_2));
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -114,18 +114,18 @@ public class NewsFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
 
                 if (!newsItems.isEmpty()) {
-                    recyclerView.setAdapter(adapter);
+                    initEmptyRecyclerView();
+                    adapter.submitList(newsItems);
 
                     emptyStateTextView.setVisibility(View.INVISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     textViewTitle.setVisibility(View.VISIBLE);
-                    adapter.submitList(newsItems);
                 }
 
                 if (newsItems.isEmpty()) {
                     initEmptyRecyclerView();
-
                     adapter.submitList(newsItems);
+
                     textViewTitle.setVisibility(View.INVISIBLE);
                     emptyStateTextView.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
@@ -170,7 +170,7 @@ public class NewsFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mNewsViewModel.fetchData(query, getString(R.string.API_KEY_2));
+                    mNewsViewModel.getNews(query, getString(R.string.API_KEY_2));
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }
