@@ -13,7 +13,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private BottomNavigationView bottomNavigationView;
 
     @Override

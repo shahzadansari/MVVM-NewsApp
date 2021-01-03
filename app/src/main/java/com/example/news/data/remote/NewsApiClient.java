@@ -2,7 +2,6 @@ package com.example.news.data.remote;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.news.data.remote.api.NewsAPI;
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
 import com.example.news.utils.Utils;

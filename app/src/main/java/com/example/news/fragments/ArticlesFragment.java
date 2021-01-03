@@ -32,7 +32,6 @@ import com.example.newsItem.R;
 
 import java.util.List;
 
-
 public class ArticlesFragment extends Fragment {
 
     private RecyclerView recyclerView;

@@ -54,8 +54,6 @@ public class NewsDetailActivity extends AppCompatActivity
     private FavoritesViewModel mFavoritesViewModel;
     private NewsItem newsItem;
 
-    private static final String TAG = "NewsDetailActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

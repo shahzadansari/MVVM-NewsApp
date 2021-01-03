@@ -1,4 +1,4 @@
-package com.example.news.data.remote.api;
+package com.example.news.data.remote;
 
 import com.example.news.models.RootJsonData;
 

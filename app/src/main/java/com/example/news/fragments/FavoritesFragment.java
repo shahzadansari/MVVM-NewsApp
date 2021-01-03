@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,8 +31,6 @@ public class FavoritesFragment extends Fragment {
     private Context mContext;
 
     private FavoritesViewModel mFavoritesViewModel;
-    
-    //TODO: Add delete articles on swipe
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -56,6 +55,7 @@ public class FavoritesFragment extends Fragment {
         recyclerView = rootView.findViewById(R.id.recycler_view);
         adapter = new NewsItemAdapter(mContext);
         initEmptyRecyclerView();
+        initAdapterGestures();
 
         mFavoritesViewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
         subscribeObservers();
@@ -68,6 +68,8 @@ public class FavoritesFragment extends Fragment {
             @Override
             public void onChanged(List<NewsItem> savedArticles) {
 
+                initEmptyRecyclerView();
+
                 if (!savedArticles.isEmpty()) {
                     adapter.submitList(savedArticles);
                     emptyStateTextView.setVisibility(View.INVISIBLE);
@@ -77,6 +79,7 @@ public class FavoritesFragment extends Fragment {
                 if (savedArticles.isEmpty()) {
                     adapter.submitList(savedArticles);
                     emptyStateTextView.setVisibility(View.VISIBLE);
+                    emptyStateTextView.setText("No Articles Found!");
                     textViewTitle.setVisibility(View.INVISIBLE);
                 }
             }
@@ -84,11 +87,35 @@ public class FavoritesFragment extends Fragment {
     }
 
     private void initEmptyRecyclerView() {
+        adapter = new NewsItemAdapter(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
                 (mContext, LinearLayoutManager.VERTICAL, false);
 
         recyclerView.setLayoutManager(linearLayoutManager);
+    }
+
+    private void initAdapterGestures() {
+        ItemTouchHelper helper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0,
+                        ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                    @Override
+                    public boolean onMove(RecyclerView recyclerView,
+                                          RecyclerView.ViewHolder viewHolder,
+                                          RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(RecyclerView.ViewHolder viewHolder,
+                                         int direction) {
+                        int position = viewHolder.getAdapterPosition();
+                        NewsItem newsItem = adapter.getArticleAt(position);
+                        mFavoritesViewModel.deleteArticle(newsItem);
+                    }
+                });
+
+        helper.attachToRecyclerView(recyclerView);
     }
 }

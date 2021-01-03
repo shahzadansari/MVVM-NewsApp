@@ -57,10 +57,13 @@ public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewH
         }
     };
 
-
     public NewsItemAdapter(Context context) {
         super(DIFF_CALLBACK);
         mContext = context;
+    }
+
+    public NewsItem getArticleAt(int position) {
+        return getItem(position);
     }
 
     @NonNull
