@@ -16,11 +16,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
+import com.example.news.models.NewsItem;
+import com.example.news.models.Source;
 import com.example.news.utils.Utils;
+import com.example.news.viewmodels.FavoritesViewModel;
 import com.example.newsItem.R;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -41,10 +45,14 @@ public class NewsDetailActivity extends AppCompatActivity
     private String mDate;
     private String mSource;
     private String mAuthor;
+    private String mDescription;
     private boolean isHideToolbarView = false;
     private LinearLayout titleAppbar;
     private AppBarLayout appBarLayout;
     private FrameLayout frameLayoutDateBehavior;
+
+    private FavoritesViewModel mFavoritesViewModel;
+    private NewsItem newsItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +80,15 @@ public class NewsDetailActivity extends AppCompatActivity
         datePublishedTextView = findViewById(R.id.text_view_date_published);
 
         Intent intent = getIntent();
-        mUrl = intent.getStringExtra("url");
-        mUrlToImage = intent.getStringExtra("urlToImage");
-        mTitle = intent.getStringExtra("title");
-        mDate = intent.getStringExtra("date");
-        mSource = intent.getStringExtra("source");
-        mAuthor = intent.getStringExtra("author");
+        newsItem = intent.getParcelableExtra("selected_article");
+        newsItem.setSource(new Source(intent.getStringExtra("source")));
+        mSource = newsItem.getSource().getName();
+        mUrl = newsItem.getUrl();
+        mUrlToImage = newsItem.getUrlToImage();
+        mTitle = newsItem.getTitle();
+        mDate = newsItem.getPublishedAt();
+        mAuthor = newsItem.getAuthor();
+        mDescription = newsItem.getDescription();
 
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.error(Utils.getRandomDrawableColor());
@@ -96,6 +107,7 @@ public class NewsDetailActivity extends AppCompatActivity
 
         initWebView(mUrl);
 
+        mFavoritesViewModel = ViewModelProviders.of(this).get(FavoritesViewModel.class);
     }
 
     private String appendAuthorWithBullet(String mAuthor) {
@@ -171,6 +183,11 @@ public class NewsDetailActivity extends AppCompatActivity
             intent.setData(Uri.parse(mUrl));
             startActivity(intent);
             return true;
+
+        } else if (id == R.id.save) {
+
+            mFavoritesViewModel.insertArticle(newsItem);
+            Toast.makeText(this, "Added to Favorites", Toast.LENGTH_SHORT).show();
 
         } else if (id == R.id.share) {
 

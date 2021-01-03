@@ -25,18 +25,17 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.adapters.NewsItemAdapterV2;
+import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.viewmodels.ArticlesViewModel;
 import com.example.newsItem.R;
 
 import java.util.List;
 
-
 public class ArticlesFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapterV2 adapter;
+    private NewsItemAdapter adapter;
 
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
@@ -85,7 +84,7 @@ public class ArticlesFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mArticlesViewModel.fetchData(keyword, getString(R.string.API_KEY));
+            mArticlesViewModel.getArticles(keyword, getString(R.string.API_KEY));
         });
 
         setHasOptionsMenu(true);
@@ -98,7 +97,7 @@ public class ArticlesFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mArticlesViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            mArticlesViewModel.getArticles(keyword, getString(R.string.API_KEY_2));
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -138,7 +137,7 @@ public class ArticlesFragment extends Fragment {
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapterV2(mContext);
+        adapter = new NewsItemAdapter(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -170,7 +169,7 @@ public class ArticlesFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mArticlesViewModel.fetchData(query, getString(R.string.API_KEY));
+                    mArticlesViewModel.getArticles(query, getString(R.string.API_KEY));
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }

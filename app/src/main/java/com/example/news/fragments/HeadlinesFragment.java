@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.adapters.NewsItemAdapterV2;
+import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.viewmodels.HeadlinesViewModel;
 import com.example.newsItem.R;
@@ -32,7 +32,7 @@ import java.util.List;
 public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapterV2 adapter;
+    private NewsItemAdapter adapter;
 
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
@@ -73,7 +73,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         spinner = rootView.findViewById(R.id.spinner_category);
         cardView = rootView.findViewById(R.id.card_view);
 
-        adapter = new NewsItemAdapterV2(mContext);
+        adapter = new NewsItemAdapter(mContext);
 
         initSpinner();
         initEmptyRecyclerView();
@@ -89,7 +89,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY_2));
+            mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY_2));
         });
 
         return rootView;
@@ -101,7 +101,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY));
+            mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY));
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -156,7 +156,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapterV2(mContext);
+        adapter = new NewsItemAdapter(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -170,7 +170,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         category = parent.getItemAtPosition(position).toString().toLowerCase();
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        mHeadlinesViewModel.fetchData(category, getString(R.string.API_KEY_2));
+        mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY_2));
     }
 
     @Override

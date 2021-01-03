@@ -26,7 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.adapters.NewsItemAdapterV2;
+import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.viewmodels.NewsViewModel;
 import com.example.newsItem.R;
@@ -36,7 +36,7 @@ import java.util.List;
 public class NewsFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapterV2 adapter;
+    private NewsItemAdapter adapter;
 
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
@@ -71,7 +71,7 @@ public class NewsFragment extends Fragment {
         textViewTitle = rootView.findViewById(R.id.text_view_top_headlines);
         recyclerView = rootView.findViewById(R.id.recycler_view);
 
-        adapter = new NewsItemAdapterV2(mContext);
+        adapter = new NewsItemAdapter(mContext);
 
         if (savedInstanceState != null) {
             keyword = savedInstanceState.getString("keyword");
@@ -86,7 +86,7 @@ public class NewsFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            mNewsViewModel.getNews(keyword, getString(R.string.API_KEY_2));
         });
 
         setHasOptionsMenu(true);
@@ -99,7 +99,7 @@ public class NewsFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mNewsViewModel.fetchData(keyword, getString(R.string.API_KEY_2));
+            mNewsViewModel.getNews(keyword, getString(R.string.API_KEY_2));
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -114,18 +114,18 @@ public class NewsFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
 
                 if (!newsItems.isEmpty()) {
-                    recyclerView.setAdapter(adapter);
+                    initEmptyRecyclerView();
+                    adapter.submitList(newsItems);
 
                     emptyStateTextView.setVisibility(View.INVISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
                     textViewTitle.setVisibility(View.VISIBLE);
-                    adapter.submitList(newsItems);
                 }
 
                 if (newsItems.isEmpty()) {
                     initEmptyRecyclerView();
-
                     adapter.submitList(newsItems);
+
                     textViewTitle.setVisibility(View.INVISIBLE);
                     emptyStateTextView.setVisibility(View.VISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
@@ -138,7 +138,7 @@ public class NewsFragment extends Fragment {
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapterV2(mContext);
+        adapter = new NewsItemAdapter(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
@@ -170,7 +170,7 @@ public class NewsFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mNewsViewModel.fetchData(query, getString(R.string.API_KEY_2));
+                    mNewsViewModel.getNews(query, getString(R.string.API_KEY_2));
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }

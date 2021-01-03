@@ -72,4 +72,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata:2.2.0"
     // Lifecycle extensions
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+    // Room components
+    implementation "androidx.room:room-runtime:2.2.6"
+    annotationProcessor "androidx.room:room-compiler:2.2.6"
 }

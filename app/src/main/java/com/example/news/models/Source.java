@@ -10,6 +10,10 @@ public class Source {
     @SerializedName("name")
     private String name;
 
+    public Source(String name) {
+        this.name = name;
+    }
+
     public String getId() {
         return id;
     }
