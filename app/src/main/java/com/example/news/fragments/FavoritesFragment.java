@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
@@ -113,6 +114,7 @@ public class FavoritesFragment extends Fragment {
                         int position = viewHolder.getAdapterPosition();
                         NewsItem newsItem = adapter.getArticleAt(position);
                         mFavoritesViewModel.deleteArticle(newsItem);
+                        Toast.makeText(mContext, "Removed from Favorites", Toast.LENGTH_SHORT).show();
                     }
                 });
 

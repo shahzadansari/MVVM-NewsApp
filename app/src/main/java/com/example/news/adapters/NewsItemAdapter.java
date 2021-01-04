@@ -5,17 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.view.ViewCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,11 +36,14 @@ import com.bumptech.glide.request.target.Target;
 import com.example.news.NewsDetailActivity;
 import com.example.news.models.NewsItem;
 import com.example.news.utils.Utils;
+import com.example.news.viewmodels.FavoritesViewModel;
 import com.example.newsItem.R;
 
 public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewHolder> {
 
     private Context mContext;
+    private FavoritesViewModel mFavoritesViewModel;
+    private static final String TAG = "NewsItemAdapter";
 
     private static final DiffUtil.ItemCallback<NewsItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<NewsItem>() {
         @Override
@@ -60,6 +68,7 @@ public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewH
     public NewsItemAdapter(Context context) {
         super(DIFF_CALLBACK);
         mContext = context;
+        mFavoritesViewModel = ViewModelProviders.of((FragmentActivity) context).get(FavoritesViewModel.class);
     }
 
     public NewsItem getArticleAt(int position) {
@@ -114,7 +123,7 @@ public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewH
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+            implements View.OnClickListener, View.OnCreateContextMenuListener {
 
         private ImageView titleImage;
         private TextView textViewAuthor;
@@ -136,6 +145,7 @@ public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewH
             textViewPublishedAt = itemView.findViewById(R.id.text_view_publishedAt);
             progressBarInImage = itemView.findViewById(R.id.progress_bar_image);
             itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         @Override
@@ -156,6 +166,21 @@ public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewH
             } else {
                 mContext.startActivity(intent);
             }
+        }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(0, v.getId(), 0, "Add to Favorites"); //groupId, itemId, order, title
+            menu.getItem(0).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    int position = getAdapterPosition();
+                    NewsItem newsItem = getItem(position);
+                    mFavoritesViewModel.insertArticle(newsItem);
+                    Toast.makeText(mContext, "Added to Favorites", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
         }
     }
 }
