@@ -1,14 +1,17 @@
-# News-App
+# News-App (MVVM-Room-Retrofit)
 
-Android Application which uses [News API](https://newsapi.org/) to display Top Headlines and finds different Articles from all over the web.
+Android Application which uses [News API](https://newsapi.org/) to display Top Headlines and finds different Articles from all over the web. Also, gives users the ability to save those articles to refer to them later.
 
 ### Screenshots
-![Webp net-compress-image (3)](https://user-images.githubusercontent.com/43310446/93147673-4c98ba80-f70b-11ea-8807-75a2bc094a9e.jpg)          ![Webp net-compress-image (4)](https://user-images.githubusercontent.com/43310446/93147742-7c47c280-f70b-11ea-998d-b17970ed2b8f.jpg) 
+![Screenshot_20210104-222830_2_270x550](https://user-images.githubusercontent.com/43310446/103564669-bf0eef80-4ee0-11eb-8259-b91b023de5e1.jpg) ![Screenshot_20210104-222854_270x550](https://user-images.githubusercontent.com/43310446/103565096-86bbe100-4ee1-11eb-9340-accfb4bc7374.jpg) ![Screenshot_20210104-223109_270x550](https://user-images.githubusercontent.com/43310446/103565732-9ee03000-4ee2-11eb-941d-61974d24b489.jpg)
 
+![Screenshot_20210104-222908_270x550](https://user-images.githubusercontent.com/43310446/103565317-f6ca6700-4ee1-11eb-8f64-f8a31d22b648.jpg) ![Screenshot_20210104-222848_270x550](https://user-images.githubusercontent.com/43310446/103565566-5c1e5800-4ee2-11eb-9c9d-60c53595ffb8.jpg) ![Screenshot_20210104-232525_270x550](https://user-images.githubusercontent.com/43310446/103567321-6b52d500-4ee5-11eb-8f48-70d917d533dc.jpg) 
 
-![Webp net-compress-image (5)](https://user-images.githubusercontent.com/43310446/93147839-c16bf480-f70b-11ea-8f1e-7aea15ac1d2f.jpg)           ![Webp net-compress-image (6)](https://user-images.githubusercontent.com/43310446/93147905-f5471a00-f70b-11ea-8af1-0d215eba892b.jpg)
+### Screen Recording
+https://user-images.githubusercontent.com/43310446/103568543-89213980-4ee7-11eb-904a-25f188cc12d8.mp4
 
 ### Libraries Used
+* [Room](https://developer.android.com/training/data-storage/room)
 * [Retrofit](https://square.github.io/retrofit/)
 * [Glide](https://github.com/bumptech/glide)
 * [PrettyTime](https://github.com/ocpsoft/prettytime)
@@ -16,7 +19,4 @@ Android Application which uses [News API](https://newsapi.org/) to display Top H
 ### API Used
 * [News API](https://newsapi.org/)
 
-
 You can register for a free API Key at [News API](https://newsapi.org/).
-
-`public static final String API_KEY = "YOUR_API_KEY"`
