@@ -63,9 +63,9 @@ public class NewsApiClient {
         });
     }
 
-    public void getArticles(String keyword, String apiKey) {
+    public void getArticles(String keyword, int pageNumber) {
 
-        Call<RootJsonData> rootJsonDataCall = createArticlesJsonDataCall(keyword, apiKey);
+        Call<RootJsonData> rootJsonDataCall = createArticlesJsonDataCall(keyword, pageNumber);
         rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -127,8 +127,7 @@ public class NewsApiClient {
     }
 
 
-
-    private Call<RootJsonData> createArticlesJsonDataCall(String keyword, String apiKey) {
+    private Call<RootJsonData> createArticlesJsonDataCall(String keyword, int pageNumber) {
         String language = Locale.getDefault().getLanguage();
         boolean isLanguageAvailable = Utils.checkLanguage(language);
         if (isLanguageAvailable) {
@@ -138,10 +137,8 @@ public class NewsApiClient {
         }
 
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-
-        return newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, apiKey);
+        return newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, Utils.API_KEY, pageNumber);
     }
-
 
 
     private Call<RootJsonData> createHeadlinesJsonDataCall(String category, String apiKey) {

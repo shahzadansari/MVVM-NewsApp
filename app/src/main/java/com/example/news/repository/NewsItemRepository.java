@@ -72,8 +72,8 @@ public class NewsItemRepository {
         mNewsApiClient.getHeadlines(keyword, apiKey);
     }
 
-    public void getArticles(String keyword, String apiKey){
-        mNewsApiClient.getArticles(keyword, apiKey);
+    public void getArticles(String keyword, int pageNumber){
+        mNewsApiClient.getArticles(keyword, pageNumber);
     }
 
     public void getNews(String keyword, String apiKey){

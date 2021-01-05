@@ -13,6 +13,10 @@ import java.util.Random;
 
 public class Utils {
 
+    public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
+    public static final String API_KEY2 = "9be5527ccbff498c87db85f61a585e19";
+
+
     public static ColorDrawable[] vibrantLightColorList =
             {
                     new ColorDrawable(Color.parseColor("#ffeead")),

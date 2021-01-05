@@ -6,8 +6,6 @@
     <string name="no_news_found">Nothing found.</string>
     <string name="search_keyword">Search Keyword</string>
     <string name="enter_keyword_here">Enter keyword here</string>
-    <string name="API_KEY">c2194f57d73e4392ae4ee0bf69e9d391</string>
-    <string name="API_KEY_2">9be5527ccbff498c87db85f61a585e19</string>
 
     <string-array name="categories_array">
         <item>Business</item>

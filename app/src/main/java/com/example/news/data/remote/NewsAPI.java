@@ -32,5 +32,6 @@ public interface NewsAPI {
     Call<RootJsonData> searchArticlesByKeyWord(@Query("q") String keyword,
                                                @Query("sortBy") String sortBy,
                                                @Query("language") String language,
-                                               @Query("apiKey") String apiKey);
+                                               @Query("apiKey") String apiKey,
+                                               @Query("page") int pageNumber);
 }

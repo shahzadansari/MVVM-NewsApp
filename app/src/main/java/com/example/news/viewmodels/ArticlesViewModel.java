@@ -20,7 +20,7 @@ public class ArticlesViewModel extends ViewModel {
         return newsItemRepository.getArticlesObserver();
     }
 
-    public void getArticles(String keyword, String apiKey){
-        newsItemRepository.getArticles(keyword, apiKey);
+    public void getArticles(String keyword, int pageNumber) {
+        newsItemRepository.getArticles(keyword, pageNumber);
     }
 }
