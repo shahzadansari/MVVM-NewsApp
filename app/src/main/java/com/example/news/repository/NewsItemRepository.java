@@ -23,8 +23,8 @@ public class NewsItemRepository {
     private static NewsItemRepository instance;
     private NewsApiClient mNewsApiClient;
 
-    public static NewsItemRepository getInstance(){
-        if(instance == null){
+    public static NewsItemRepository getInstance() {
+        if (instance == null) {
             instance = new NewsItemRepository();
         }
         return instance;
@@ -68,15 +68,15 @@ public class NewsItemRepository {
         new DeleteAllNotesAsyncTask(mArticleDao).execute();
     }
 
-    public void getHeadlines(String keyword, String apiKey){
+    public void getHeadlines(String keyword, String apiKey) {
         mNewsApiClient.getHeadlines(keyword, apiKey);
     }
 
-    public void getArticles(String keyword, int pageNumber){
+    public void getArticles(String keyword, int pageNumber) {
         mNewsApiClient.getArticles(keyword, pageNumber);
     }
 
-    public void getNews(String keyword, String apiKey){
-        mNewsApiClient.getNews(keyword, apiKey);
+    public void getNews(String keyword, int pageNumber) {
+        mNewsApiClient.getNews(keyword, pageNumber);
     }
 }

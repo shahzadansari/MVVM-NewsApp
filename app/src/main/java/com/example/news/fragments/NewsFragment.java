@@ -28,7 +28,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
-import com.example.news.utils.Utils;
 import com.example.news.viewmodels.NewsViewModel;
 import com.example.newsItem.R;
 
@@ -48,6 +47,8 @@ public class NewsFragment extends Fragment {
     private String keyword = "";
 
     private NewsViewModel mNewsViewModel;
+
+    private int pageNumber = 1;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -87,7 +88,7 @@ public class NewsFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mNewsViewModel.getNews(keyword, Utils.API_KEY);
+            mNewsViewModel.getNews(keyword, pageNumber);
         });
 
         setHasOptionsMenu(true);
@@ -100,7 +101,7 @@ public class NewsFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mNewsViewModel.getNews(keyword, Utils.API_KEY);
+            mNewsViewModel.getNews(keyword, pageNumber);
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -171,7 +172,7 @@ public class NewsFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mNewsViewModel.getNews(query, Utils.API_KEY);
+                    mNewsViewModel.getNews(query, pageNumber);
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }
