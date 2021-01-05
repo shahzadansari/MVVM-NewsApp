@@ -47,6 +47,8 @@ public class ArticlesFragment extends Fragment {
 
     private ArticlesViewModel mArticlesViewModel;
 
+    private int pageNumber = 1;
+
     public ArticlesFragment() {
         // Required empty public constructor
     }
@@ -84,7 +86,7 @@ public class ArticlesFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mArticlesViewModel.getArticles(keyword, getString(R.string.API_KEY));
+            mArticlesViewModel.getArticles(keyword, pageNumber);
         });
 
         setHasOptionsMenu(true);
@@ -97,7 +99,7 @@ public class ArticlesFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mArticlesViewModel.getArticles(keyword, getString(R.string.API_KEY_2));
+            mArticlesViewModel.getArticles(keyword, pageNumber);
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -169,7 +171,7 @@ public class ArticlesFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mArticlesViewModel.getArticles(query, getString(R.string.API_KEY));
+                    mArticlesViewModel.getArticles(query, pageNumber);
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }

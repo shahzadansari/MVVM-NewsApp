@@ -47,6 +47,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
     private HeadlinesViewModel mHeadlinesViewModel;
 
+    private int pageNumber;
+
     public HeadlinesFragment() {
         // Required empty public constructor
     }
@@ -89,7 +91,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY_2));
+            mHeadlinesViewModel.getHeadlines(category, pageNumber);
         });
 
         return rootView;
@@ -101,7 +103,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY));
+            mHeadlinesViewModel.getHeadlines(category, pageNumber);
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -170,7 +172,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         category = parent.getItemAtPosition(position).toString().toLowerCase();
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        mHeadlinesViewModel.getHeadlines(category, getString(R.string.API_KEY_2));
+        mHeadlinesViewModel.getHeadlines(category, pageNumber);
     }
 
     @Override

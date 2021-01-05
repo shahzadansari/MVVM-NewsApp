@@ -20,7 +20,7 @@ public class HeadlinesViewModel extends ViewModel {
         return newsItemRepository.getHeadlinesObserver();
     }
 
-    public void getHeadlines(String keyword, String apiKey){
-        newsItemRepository.getHeadlines(keyword, apiKey);
+    public void getHeadlines(String keyword, int pageNumber){
+        newsItemRepository.getHeadlines(keyword, pageNumber);
     }
 }

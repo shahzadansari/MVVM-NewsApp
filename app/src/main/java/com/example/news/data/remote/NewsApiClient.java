@@ -47,9 +47,9 @@ public class NewsApiClient {
         return headlines;
     }
 
-    public void getNews(String keyword, String apiKey) {
+    public void getNews(String keyword, int pageNumber) {
 
-        Call<RootJsonData> rootJsonDataCall = createNewsJsonDataCall(keyword, apiKey);
+        Call<RootJsonData> rootJsonDataCall = createNewsJsonDataCall(keyword, pageNumber);
         rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -63,9 +63,9 @@ public class NewsApiClient {
         });
     }
 
-    public void getArticles(String keyword, String apiKey) {
+    public void getArticles(String keyword, int pageNumber) {
 
-        Call<RootJsonData> rootJsonDataCall = createArticlesJsonDataCall(keyword, apiKey);
+        Call<RootJsonData> rootJsonDataCall = createArticlesJsonDataCall(keyword, pageNumber);
         rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -79,9 +79,9 @@ public class NewsApiClient {
         });
     }
 
-    public void getHeadlines(String keyword, String apiKey) {
+    public void getHeadlines(String keyword, int pageNumber) {
 
-        Call<RootJsonData> rootJsonDataCall = createHeadlinesJsonDataCall(keyword, apiKey);
+        Call<RootJsonData> rootJsonDataCall = createHeadlinesJsonDataCall(keyword, pageNumber);
         rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -95,7 +95,7 @@ public class NewsApiClient {
         });
     }
 
-    private Call<RootJsonData> createNewsJsonDataCall(String keyword, String apiKey) {
+    private Call<RootJsonData> createNewsJsonDataCall(String keyword, int pageNumber) {
 
         String locale = Utils.getCountry();
         boolean isLocaleAvailable = Utils.checkLocale(locale);
@@ -109,7 +109,7 @@ public class NewsApiClient {
         if (keyword.isEmpty()) {
 
             if (isLocaleAvailable) {
-                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, apiKey);
+                rootJsonDataCall = newsAPI.getTopHeadlinesByCountry(locale, language, Utils.API_KEY, pageNumber);
             } else {
                 if (isLanguageAvailable) {
                     language = Utils.getLanguage();
@@ -117,18 +117,17 @@ public class NewsApiClient {
                     language = "en";
                 }
 
-                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, apiKey);
+                rootJsonDataCall = newsAPI.getTopHeadlinesByLanguage(language, Utils.API_KEY, pageNumber);
             }
         } else {
-            rootJsonDataCall = newsAPI.searchNewsByKeyWord(keyword, SORT_ORDER, language, apiKey);
+            rootJsonDataCall = newsAPI.searchNewsByKeyWord(keyword, SORT_ORDER, language, Utils.API_KEY, pageNumber);
         }
 
         return rootJsonDataCall;
     }
 
 
-
-    private Call<RootJsonData> createArticlesJsonDataCall(String keyword, String apiKey) {
+    private Call<RootJsonData> createArticlesJsonDataCall(String keyword, int pageNumber) {
         String language = Locale.getDefault().getLanguage();
         boolean isLanguageAvailable = Utils.checkLanguage(language);
         if (isLanguageAvailable) {
@@ -138,13 +137,11 @@ public class NewsApiClient {
         }
 
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-
-        return newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, apiKey);
+        return newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, Utils.API_KEY, pageNumber);
     }
 
 
-
-    private Call<RootJsonData> createHeadlinesJsonDataCall(String category, String apiKey) {
+    private Call<RootJsonData> createHeadlinesJsonDataCall(String category, int pageNumber) {
         String language = Locale.getDefault().getLanguage();
         boolean isLanguageAvailable = Utils.checkLanguage(language);
         if (isLanguageAvailable) {
@@ -155,6 +152,6 @@ public class NewsApiClient {
 
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
 
-        return newsAPI.getTopHeadlinesByCategory(category, language, apiKey);
+        return newsAPI.getTopHeadlinesByCategory(category, language, Utils.API_KEY, pageNumber);
     }
 }

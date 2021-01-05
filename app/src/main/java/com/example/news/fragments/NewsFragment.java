@@ -48,6 +48,8 @@ public class NewsFragment extends Fragment {
 
     private NewsViewModel mNewsViewModel;
 
+    private int pageNumber = 1;
+
     public NewsFragment() {
         // Required empty public constructor
     }
@@ -86,7 +88,7 @@ public class NewsFragment extends Fragment {
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mNewsViewModel.getNews(keyword, getString(R.string.API_KEY_2));
+            mNewsViewModel.getNews(keyword, pageNumber);
         });
 
         setHasOptionsMenu(true);
@@ -99,7 +101,7 @@ public class NewsFragment extends Fragment {
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mNewsViewModel.getNews(keyword, getString(R.string.API_KEY_2));
+            mNewsViewModel.getNews(keyword, pageNumber);
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -170,7 +172,7 @@ public class NewsFragment extends Fragment {
                     initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mNewsViewModel.getNews(query, getString(R.string.API_KEY_2));
+                    mNewsViewModel.getNews(query, pageNumber);
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }
