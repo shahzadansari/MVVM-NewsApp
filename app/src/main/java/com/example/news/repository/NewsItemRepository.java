@@ -68,8 +68,8 @@ public class NewsItemRepository {
         new DeleteAllNotesAsyncTask(mArticleDao).execute();
     }
 
-    public void getHeadlines(String keyword, String apiKey) {
-        mNewsApiClient.getHeadlines(keyword, apiKey);
+    public void getHeadlines(String keyword, int pageNumber) {
+        mNewsApiClient.getHeadlines(keyword, pageNumber);
     }
 
     public void getArticles(String keyword, int pageNumber) {

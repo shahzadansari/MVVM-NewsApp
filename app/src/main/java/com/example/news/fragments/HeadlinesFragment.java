@@ -24,7 +24,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
-import com.example.news.utils.Utils;
 import com.example.news.viewmodels.HeadlinesViewModel;
 import com.example.newsItem.R;
 
@@ -47,6 +46,8 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
     private CardView cardView;
 
     private HeadlinesViewModel mHeadlinesViewModel;
+
+    private int pageNumber;
 
     public HeadlinesFragment() {
         // Required empty public constructor
@@ -90,7 +91,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
         swipeRefreshLayout.setOnRefreshListener(() -> {
             initEmptyRecyclerView();
-            mHeadlinesViewModel.getHeadlines(category, Utils.API_KEY);
+            mHeadlinesViewModel.getHeadlines(category, pageNumber);
         });
 
         return rootView;
@@ -102,7 +103,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mHeadlinesViewModel.getHeadlines(category, Utils.API_KEY);
+            mHeadlinesViewModel.getHeadlines(category, pageNumber);
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
@@ -171,7 +172,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
         category = parent.getItemAtPosition(position).toString().toLowerCase();
         initEmptyRecyclerView();
         progressBar.setVisibility(View.VISIBLE);
-        mHeadlinesViewModel.getHeadlines(category, Utils.API_KEY);
+        mHeadlinesViewModel.getHeadlines(category, pageNumber);
     }
 
     @Override

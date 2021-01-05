@@ -79,9 +79,9 @@ public class NewsApiClient {
         });
     }
 
-    public void getHeadlines(String keyword, String apiKey) {
+    public void getHeadlines(String keyword, int pageNumber) {
 
-        Call<RootJsonData> rootJsonDataCall = createHeadlinesJsonDataCall(keyword, apiKey);
+        Call<RootJsonData> rootJsonDataCall = createHeadlinesJsonDataCall(keyword, pageNumber);
         rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -141,7 +141,7 @@ public class NewsApiClient {
     }
 
 
-    private Call<RootJsonData> createHeadlinesJsonDataCall(String category, String apiKey) {
+    private Call<RootJsonData> createHeadlinesJsonDataCall(String category, int pageNumber) {
         String language = Locale.getDefault().getLanguage();
         boolean isLanguageAvailable = Utils.checkLanguage(language);
         if (isLanguageAvailable) {
@@ -152,6 +152,6 @@ public class NewsApiClient {
 
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
 
-        return newsAPI.getTopHeadlinesByCategory(category, language, apiKey);
+        return newsAPI.getTopHeadlinesByCategory(category, language, Utils.API_KEY, pageNumber);
     }
 }
