@@ -72,13 +72,13 @@ public class FavoritesFragment extends Fragment {
                 initEmptyRecyclerView();
 
                 if (!savedArticles.isEmpty()) {
-                    adapter.submitList(savedArticles);
+//                    adapter.submitList(savedArticles);
                     emptyStateTextView.setVisibility(View.INVISIBLE);
                     textViewTitle.setVisibility(View.VISIBLE);
                 }
 
                 if (savedArticles.isEmpty()) {
-                    adapter.submitList(savedArticles);
+//                    adapter.submitList(savedArticles);
                     emptyStateTextView.setVisibility(View.VISIBLE);
                     emptyStateTextView.setText("No Articles Found!");
                     textViewTitle.setVisibility(View.INVISIBLE);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,21 +22,22 @@ import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.news.NewsItemViewModel;
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.viewmodels.ArticlesViewModel;
 import com.example.newsItem.R;
 
-import java.util.List;
-
 public class ArticlesFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+
+//    final private NewsItemAdapter adapter;
 
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
@@ -48,6 +50,7 @@ public class ArticlesFragment extends Fragment {
     private ArticlesViewModel mArticlesViewModel;
 
     private int pageNumber = 1;
+    private static final String TAG = "ArticlesFragment";
 
     public ArticlesFragment() {
         // Required empty public constructor
@@ -77,17 +80,50 @@ public class ArticlesFragment extends Fragment {
             keyword = savedInstanceState.getString("keyword");
         }
 
-        initEmptyRecyclerView();
+//        mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+//        initEmptyRecyclerView();
 
-        mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
-        subscribeObservers();
+        //setting up recyclerview
+        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
+//        recyclerView.setHasFixedSize(true);
+        final NewsItemAdapter adapter = new NewsItemAdapter(mContext);
 
-        fetchData();
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            initEmptyRecyclerView();
-            mArticlesViewModel.getArticles(keyword, pageNumber);
+        //getting our ItemViewModel
+        NewsItemViewModel itemViewModel = ViewModelProviders.of(this).get(NewsItemViewModel.class);
+        itemViewModel.itemPagedList.observe(getViewLifecycleOwner(), new Observer<PagedList<NewsItem>>() {
+            @Override
+            public void onChanged(PagedList<NewsItem> newsItems) {
+                Log.d(TAG, "onChanged: snapshot " + newsItems.snapshot().size());
+                Log.d(TAG, "onChanged: size " + newsItems.size());
+                progressBar.setVisibility(View.GONE);
+//                initEmptyRecyclerView();
+                adapter.submitList(newsItems);
+                emptyStateTextView.setVisibility(View.INVISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+                textViewTitle.setVisibility(View.VISIBLE);
+            }
         });
+
+        // setting the adapter
+        recyclerView.setAdapter(adapter);
+
+//        fetchData();
+
+//        swipeRefreshLayout.setOnRefreshListener(() -> {
+//            initEmptyRecyclerView();
+//            mArticlesViewModel.getArticles(keyword, pageNumber);
+//        });
+
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//
+//                if(!recyclerView.canScrollVertically(1)){
+//                    // search the next page
+//                    mArticlesViewModel.searchNextPage();
+//                }
+//            }
+//        });
 
         setHasOptionsMenu(true);
         return rootView;
@@ -107,40 +143,40 @@ public class ArticlesFragment extends Fragment {
         }
     }
 
-    private void subscribeObservers() {
-        mArticlesViewModel.getArticlesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
-            @Override
-            public void onChanged(List<NewsItem> newsItems) {
-                progressBar.setVisibility(View.GONE);
-
-                if (!newsItems.isEmpty()) {
-                    initEmptyRecyclerView();
-                    adapter.submitList(newsItems);
-
-                    emptyStateTextView.setVisibility(View.INVISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    textViewTitle.setVisibility(View.VISIBLE);
-
-                }
-
-                if (newsItems.isEmpty()) {
-                    initEmptyRecyclerView();
-
-                    adapter.submitList(newsItems);
-                    textViewTitle.setVisibility(View.INVISIBLE);
-                    emptyStateTextView.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    emptyStateTextView.setText(R.string.no_news_found);
-                }
-
-            }
-        });
-    }
+//    private void subscribeObservers() {
+//        mArticlesViewModel.getArticlesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
+//            @Override
+//            public void onChanged(List<NewsItem> newsItems) {
+//                mArticlesViewModel.setIsPerformingQuery(false);
+//                progressBar.setVisibility(View.GONE);
+//
+//                if (!newsItems.isEmpty()) {
+//                    mArticlesViewModel.setIsPerformingQuery(false);
+//                    initEmptyRecyclerView();
+//                    adapter.submitList(newsItems);
+//
+//                    emptyStateTextView.setVisibility(View.INVISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    textViewTitle.setVisibility(View.VISIBLE);
+//                }
+//
+//                if (newsItems.isEmpty()) {
+//                    initEmptyRecyclerView();
+//
+//                    adapter.submitList(newsItems);
+//                    textViewTitle.setVisibility(View.INVISIBLE);
+//                    emptyStateTextView.setVisibility(View.VISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    emptyStateTextView.setText(R.string.no_news_found);
+//                }
+//            }
+//        });
+//    }
 
     public void initEmptyRecyclerView() {
 
-        adapter = new NewsItemAdapter(mContext);
-        recyclerView.setAdapter(adapter);
+//        adapter = new NewsItemAdapter(mContext);
+//        recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
                 (mContext, LinearLayoutManager.VERTICAL, false);

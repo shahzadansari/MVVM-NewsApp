@@ -23,6 +23,9 @@ public class NewsItemRepository {
     private static NewsItemRepository instance;
     private NewsApiClient mNewsApiClient;
 
+    private String mQuery;
+    private int mPageNumber;
+
     public static NewsItemRepository getInstance() {
         if (instance == null) {
             instance = new NewsItemRepository();
@@ -73,7 +76,16 @@ public class NewsItemRepository {
     }
 
     public void getArticles(String keyword, int pageNumber) {
+        if (pageNumber == 0) {
+            pageNumber = 1;
+        }
+        mQuery = keyword;
+        mPageNumber = pageNumber;
         mNewsApiClient.getArticles(keyword, pageNumber);
+    }
+
+    public void searchNextPageForArticles() {
+        mNewsApiClient.getArticles(mQuery, mPageNumber + 1);
     }
 
     public void getNews(String keyword, int pageNumber) {

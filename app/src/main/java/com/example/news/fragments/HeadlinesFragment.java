@@ -119,7 +119,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
                 if (!newsItems.isEmpty()) {
                     initEmptyRecyclerView();
-                    adapter.submitList(newsItems);
+//                    adapter.submitList(newsItems);
 
                     cardView.setVisibility(View.VISIBLE);
                     spinner.setVisibility(View.VISIBLE);
@@ -130,7 +130,7 @@ public class HeadlinesFragment extends Fragment implements AdapterView.OnItemSel
 
                 if (newsItems.isEmpty()) {
                     initEmptyRecyclerView();
-                    adapter.submitList(newsItems);
+//                    adapter.submitList(newsItems);
 
                     cardView.setVisibility(View.INVISIBLE);
                     spinner.setVisibility(View.INVISIBLE);

@@ -21,8 +21,8 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.view.ViewCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -39,11 +39,10 @@ import com.example.news.utils.Utils;
 import com.example.news.viewmodels.FavoritesViewModel;
 import com.example.newsItem.R;
 
-public class NewsItemAdapter extends ListAdapter<NewsItem, NewsItemAdapter.ViewHolder> {
+public class NewsItemAdapter extends PagedListAdapter<NewsItem, NewsItemAdapter.ViewHolder> {
 
     private Context mContext;
     private FavoritesViewModel mFavoritesViewModel;
-    private static final String TAG = "NewsItemAdapter";
 
     private static final DiffUtil.ItemCallback<NewsItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<NewsItem>() {
         @Override
