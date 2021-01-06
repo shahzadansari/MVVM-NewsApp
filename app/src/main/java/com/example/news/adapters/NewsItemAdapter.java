@@ -52,15 +52,7 @@ public class NewsItemAdapter extends PagedListAdapter<NewsItem, NewsItemAdapter.
 
         @Override
         public boolean areContentsTheSame(NewsItem oldItem, NewsItem newItem) {
-            return (oldItem.getTitle().equals(newItem.getTitle())
-                    && oldItem.getDescription().equals(newItem.getDescription())
-                    && oldItem.getAuthor().equals(newItem.getAuthor()))
-                    && oldItem.getContent().equals(newItem.getContent())
-                    && oldItem.getPublishedAt().equals(newItem.getPublishedAt())
-                    && oldItem.getUrlToImage().equals(newItem.getUrlToImage())
-                    && oldItem.getUrl().equals(newItem.getUrl())
-                    && oldItem.getSource().getId().equals(newItem.getSource().getId())
-                    && oldItem.getSource().getName().equals(newItem.getSource().getName());
+            return oldItem.equals(newItem);
         }
     };
 
