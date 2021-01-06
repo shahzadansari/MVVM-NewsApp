@@ -3,12 +3,14 @@ package com.example.news;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PageKeyedDataSource;
 
 import com.example.news.data.remote.NewsAPI;
 import com.example.news.data.remote.ServiceGenerator;
 import com.example.news.models.NewsItem;
 import com.example.news.models.RootJsonData;
+import com.example.news.utils.DataStatus;
 import com.example.news.utils.Utils;
 
 import java.util.ArrayList;
@@ -28,21 +30,36 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
     public static final String API_KEY = Utils.API_KEY;
     public static final int PAGE_SIZE = 10;
 
+    private String mKeyword;
+    private MutableLiveData<DataStatus> dataStatusMutableLiveData = new MutableLiveData<>();
+
+    public ArticlesDataSource(String keyword) {
+        mKeyword = keyword;
+        dataStatusMutableLiveData = new MutableLiveData<>();
+    }
+
+    public MutableLiveData<DataStatus> getDataStatusMutableLiveData() {
+        return dataStatusMutableLiveData;
+    }
+
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, NewsItem> callback) {
+        dataStatusMutableLiveData.postValue(DataStatus.LOADING);
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", SORT_ORDER, LANGUAGE, API_KEY, FIRST_PAGE, PAGE_SIZE);
+        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord(mKeyword, SORT_ORDER, LANGUAGE, API_KEY, FIRST_PAGE, PAGE_SIZE);
         call.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
                 if (response.body() != null) {
                     callback.onResult(response.body().getNewsItems(), null, FIRST_PAGE + 1);
+                    dataStatusMutableLiveData.postValue(DataStatus.LOADED);
                 }
             }
 
             @Override
             public void onFailure(Call<RootJsonData> call, Throwable t) {
                 Log.d(TAG, "onFailure: " + t.getMessage());
+                dataStatusMutableLiveData.postValue(DataStatus.ERROR);
             }
         });
 
@@ -51,7 +68,7 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, NewsItem> callback) {
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", SORT_ORDER, LANGUAGE, API_KEY, FIRST_PAGE, PAGE_SIZE);
+        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord(mKeyword, SORT_ORDER, LANGUAGE, API_KEY, FIRST_PAGE, PAGE_SIZE);
         call.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -76,10 +93,11 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, NewsItem> callback) {
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", SORT_ORDER, LANGUAGE, API_KEY, params.key, PAGE_SIZE);
+        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord(mKeyword, SORT_ORDER, LANGUAGE, API_KEY, params.key, PAGE_SIZE);
         call.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
+                dataStatusMutableLiveData.postValue(DataStatus.LOADED);
 
                 if (response.code() == 429) {
                     // no more results
@@ -102,6 +120,7 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
             @Override
             public void onFailure(Call<RootJsonData> call, Throwable t) {
                 Log.d(TAG, "onFailure: " + t.getMessage());
+                dataStatusMutableLiveData.postValue(DataStatus.ERROR);
             }
         });
     }

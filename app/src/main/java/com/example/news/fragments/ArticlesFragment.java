@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,14 +30,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.news.ArticlesViewModel;
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
-import com.example.news.viewmodels.ArticlesViewModelTBD;
+import com.example.news.utils.DataStatus;
 import com.example.newsItem.R;
 
 public class ArticlesFragment extends Fragment {
 
     private RecyclerView recyclerView;
-
-//    final private NewsItemAdapter adapter;
+    private NewsItemAdapter adapter;
 
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
@@ -46,12 +46,8 @@ public class ArticlesFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private String keyword = "";
 
-    private ArticlesViewModelTBD mArticlesViewModel;
-
-    private NewsItemAdapter adapter;
-
-    private int pageNumber = 1;
     private static final String TAG = "ArticlesFragment";
+    private ArticlesViewModel articlesViewModel;
 
     public ArticlesFragment() {
         // Required empty public constructor
@@ -81,86 +77,91 @@ public class ArticlesFragment extends Fragment {
             keyword = savedInstanceState.getString("keyword");
         }
 
-        //TODO: Deal with other features i.e, Searching, SwipeRefresh
-        // mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModelTBD.class);
         initEmptyRecyclerView();
 
-        //getting our ItemViewModel
-        ArticlesViewModel itemViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
-        itemViewModel.itemPagedList.observe(getViewLifecycleOwner(), new Observer<PagedList<NewsItem>>() {
+        articlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+        articlesViewModel.itemPagedList.observe(getViewLifecycleOwner(), new Observer<PagedList<NewsItem>>() {
             @Override
             public void onChanged(PagedList<NewsItem> newsItems) {
-                progressBar.setVisibility(View.GONE);
                 adapter.submitList(newsItems);
-
-                // TODO: Handle UI changes
-//                if (!newsItems.isEmpty()) {
-//                    emptyStateTextView.setVisibility(View.GONE);
-//                    swipeRefreshLayout.setRefreshing(false);
-//                    textViewTitle.setVisibility(View.VISIBLE);
-//                }
-//
-//                if (newsItems.isEmpty()) {
-//                    textViewTitle.setVisibility(View.INVISIBLE);
-//                    emptyStateTextView.setVisibility(View.VISIBLE);
-//                    swipeRefreshLayout.setRefreshing(false);
-//                    emptyStateTextView.setText(R.string.no_news_found);
-//                }
+                // TODO: Handle UI changes (dataStatus observer)
+            }
+        });
+        articlesViewModel.getDataStatus().observe(getViewLifecycleOwner(), new Observer<DataStatus>() {
+            @Override
+            public void onChanged(DataStatus dataStatus) {
+                switch (dataStatus) {
+                    case LOADED:
+                        progressBar.setVisibility(View.GONE);
+                        emptyStateTextView.setVisibility(View.INVISIBLE);
+                        swipeRefreshLayout.setRefreshing(false);
+                        textViewTitle.setVisibility(View.VISIBLE);
+                        break;
+                    case LOADING:
+                        progressBar.setVisibility(View.VISIBLE);
+                        swipeRefreshLayout.setRefreshing(true);
+                        textViewTitle.setVisibility(View.INVISIBLE);
+                        emptyStateTextView.setVisibility(View.INVISIBLE);
+                        break;
+                    case EMPTY:
+                        progressBar.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
+                        textViewTitle.setVisibility(View.INVISIBLE);
+                        emptyStateTextView.setVisibility(View.VISIBLE);
+                        emptyStateTextView.setText(R.string.no_news_found);
+                        break;
+                    case ERROR:
+                        progressBar.setVisibility(View.GONE);
+                        swipeRefreshLayout.setRefreshing(false);
+                        textViewTitle.setVisibility(View.INVISIBLE);
+                        emptyStateTextView.setVisibility(View.VISIBLE);
+                        emptyStateTextView.setText(R.string.no_internet_connection);
+                        break;
+                }
             }
         });
 
-//        swipeRefreshLayout.setOnRefreshListener(() -> {
-//            initEmptyRecyclerView();
-//            mArticlesViewModel.getArticles(keyword, pageNumber);
-//        });
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            articlesViewModel.setKeyword(keyword);
+        });
 
-//        setHasOptionsMenu(true);
+        setHasOptionsMenu(true);
         return rootView;
     }
 
-    private void fetchData() {
+    private void handleUIChanges(PagedList<NewsItem> newsItems) {
+        if (!newsItems.isEmpty()) {
+            Log.d(TAG, "onChanged: !empty called");
+            progressBar.setVisibility(View.GONE);
+            emptyStateTextView.setVisibility(View.INVISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
+            textViewTitle.setVisibility(View.VISIBLE);
+        }
+
+        if (newsItems.isEmpty()) {
+            progressBar.setVisibility(View.GONE);
+            textViewTitle.setVisibility(View.INVISIBLE);
+            emptyStateTextView.setVisibility(View.VISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
+            emptyStateTextView.setText(R.string.no_news_found);
+        }
+    }
+
+    private boolean checkNetworkConnection() {
+        boolean isNetworkAvailable = false;
         ConnectivityManager connectivityManager = (ConnectivityManager)
                 getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
         if (networkInfo != null && networkInfo.isConnected()) {
-            mArticlesViewModel.getArticles(keyword, pageNumber);
+            isNetworkAvailable = true;
         } else {
             progressBar.setVisibility(View.GONE);
             textViewTitle.setVisibility(View.GONE);
             emptyStateTextView.setText(R.string.no_internet_connection);
         }
+        return isNetworkAvailable;
     }
-
-//    private void subscribeObservers() {
-//        mArticlesViewModel.getArticlesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
-//            @Override
-//            public void onChanged(List<NewsItem> newsItems) {
-//                mArticlesViewModel.setIsPerformingQuery(false);
-//                progressBar.setVisibility(View.GONE);
-//
-//                if (!newsItems.isEmpty()) {
-//                    mArticlesViewModel.setIsPerformingQuery(false);
-//                    initEmptyRecyclerView();
-//                    adapter.submitList(newsItems);
-//
-//                    emptyStateTextView.setVisibility(View.INVISIBLE);
-//                    swipeRefreshLayout.setRefreshing(false);
-//                    textViewTitle.setVisibility(View.VISIBLE);
-//                }
-//
-//                if (newsItems.isEmpty()) {
-//                    initEmptyRecyclerView();
-//
-//                    adapter.submitList(newsItems);
-//                    textViewTitle.setVisibility(View.INVISIBLE);
-//                    emptyStateTextView.setVisibility(View.VISIBLE);
-//                    swipeRefreshLayout.setRefreshing(false);
-//                    emptyStateTextView.setText(R.string.no_news_found);
-//                }
-//            }
-//        });
-//    }
 
     public void initEmptyRecyclerView() {
 
@@ -193,10 +194,9 @@ public class ArticlesFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 if (query.length() > 2) {
                     keyword = query;
-                    initEmptyRecyclerView();
                     progressBar.setVisibility(View.VISIBLE);
                     textViewTitle.setVisibility(View.INVISIBLE);
-                    mArticlesViewModel.getArticles(query, pageNumber);
+                    articlesViewModel.setKeyword(query);
                 } else {
                     Toast.makeText(mContext, "Type more than two letters!", Toast.LENGTH_SHORT).show();
                 }
