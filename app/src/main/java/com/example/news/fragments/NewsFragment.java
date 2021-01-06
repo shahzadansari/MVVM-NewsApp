@@ -117,7 +117,7 @@ public class NewsFragment extends Fragment {
 
                 if (!newsItems.isEmpty()) {
                     initEmptyRecyclerView();
-                    adapter.submitList(newsItems);
+//                    adapter.submitList(newsItems);
 
                     emptyStateTextView.setVisibility(View.INVISIBLE);
                     swipeRefreshLayout.setRefreshing(false);
@@ -126,7 +126,7 @@ public class NewsFragment extends Fragment {
 
                 if (newsItems.isEmpty()) {
                     initEmptyRecyclerView();
-                    adapter.submitList(newsItems);
+//                    adapter.submitList(newsItems);
 
                     textViewTitle.setVisibility(View.INVISIBLE);
                     emptyStateTextView.setVisibility(View.VISIBLE);

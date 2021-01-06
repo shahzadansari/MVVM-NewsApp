@@ -37,5 +37,6 @@ public interface NewsAPI {
                                                @Query("sortBy") String sortBy,
                                                @Query("language") String language,
                                                @Query("apiKey") String apiKey,
-                                               @Query("page") int pageNumber);
+                                               @Query("page") int pageNumber,
+                                               @Query("pageSize") int pageSize);
 }

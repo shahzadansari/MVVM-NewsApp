@@ -21,21 +21,22 @@ import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.news.ArticlesViewModel;
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
-import com.example.news.viewmodels.ArticlesViewModel;
+import com.example.news.viewmodels.ArticlesViewModelTBD;
 import com.example.newsItem.R;
-
-import java.util.List;
 
 public class ArticlesFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+
+//    final private NewsItemAdapter adapter;
 
     private ProgressBar progressBar;
     private TextView emptyStateTextView;
@@ -45,9 +46,12 @@ public class ArticlesFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private String keyword = "";
 
-    private ArticlesViewModel mArticlesViewModel;
+    private ArticlesViewModelTBD mArticlesViewModel;
+
+    private NewsItemAdapter adapter;
 
     private int pageNumber = 1;
+    private static final String TAG = "ArticlesFragment";
 
     public ArticlesFragment() {
         // Required empty public constructor
@@ -77,19 +81,40 @@ public class ArticlesFragment extends Fragment {
             keyword = savedInstanceState.getString("keyword");
         }
 
+        //TODO: Deal with other features i.e, Searching, SwipeRefresh
+        // mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModelTBD.class);
         initEmptyRecyclerView();
 
-        mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
-        subscribeObservers();
+        //getting our ItemViewModel
+        ArticlesViewModel itemViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
+        itemViewModel.itemPagedList.observe(getViewLifecycleOwner(), new Observer<PagedList<NewsItem>>() {
+            @Override
+            public void onChanged(PagedList<NewsItem> newsItems) {
+                progressBar.setVisibility(View.GONE);
+                adapter.submitList(newsItems);
 
-        fetchData();
-
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            initEmptyRecyclerView();
-            mArticlesViewModel.getArticles(keyword, pageNumber);
+                // TODO: Handle UI changes
+//                if (!newsItems.isEmpty()) {
+//                    emptyStateTextView.setVisibility(View.GONE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    textViewTitle.setVisibility(View.VISIBLE);
+//                }
+//
+//                if (newsItems.isEmpty()) {
+//                    textViewTitle.setVisibility(View.INVISIBLE);
+//                    emptyStateTextView.setVisibility(View.VISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    emptyStateTextView.setText(R.string.no_news_found);
+//                }
+            }
         });
 
-        setHasOptionsMenu(true);
+//        swipeRefreshLayout.setOnRefreshListener(() -> {
+//            initEmptyRecyclerView();
+//            mArticlesViewModel.getArticles(keyword, pageNumber);
+//        });
+
+//        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -107,35 +132,35 @@ public class ArticlesFragment extends Fragment {
         }
     }
 
-    private void subscribeObservers() {
-        mArticlesViewModel.getArticlesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
-            @Override
-            public void onChanged(List<NewsItem> newsItems) {
-                progressBar.setVisibility(View.GONE);
-
-                if (!newsItems.isEmpty()) {
-                    initEmptyRecyclerView();
-                    adapter.submitList(newsItems);
-
-                    emptyStateTextView.setVisibility(View.INVISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    textViewTitle.setVisibility(View.VISIBLE);
-
-                }
-
-                if (newsItems.isEmpty()) {
-                    initEmptyRecyclerView();
-
-                    adapter.submitList(newsItems);
-                    textViewTitle.setVisibility(View.INVISIBLE);
-                    emptyStateTextView.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
-                    emptyStateTextView.setText(R.string.no_news_found);
-                }
-
-            }
-        });
-    }
+//    private void subscribeObservers() {
+//        mArticlesViewModel.getArticlesObserver().observe(getViewLifecycleOwner(), new Observer<List<NewsItem>>() {
+//            @Override
+//            public void onChanged(List<NewsItem> newsItems) {
+//                mArticlesViewModel.setIsPerformingQuery(false);
+//                progressBar.setVisibility(View.GONE);
+//
+//                if (!newsItems.isEmpty()) {
+//                    mArticlesViewModel.setIsPerformingQuery(false);
+//                    initEmptyRecyclerView();
+//                    adapter.submitList(newsItems);
+//
+//                    emptyStateTextView.setVisibility(View.INVISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    textViewTitle.setVisibility(View.VISIBLE);
+//                }
+//
+//                if (newsItems.isEmpty()) {
+//                    initEmptyRecyclerView();
+//
+//                    adapter.submitList(newsItems);
+//                    textViewTitle.setVisibility(View.INVISIBLE);
+//                    emptyStateTextView.setVisibility(View.VISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    emptyStateTextView.setText(R.string.no_news_found);
+//                }
+//            }
+//        });
+//    }
 
     public void initEmptyRecyclerView() {
 

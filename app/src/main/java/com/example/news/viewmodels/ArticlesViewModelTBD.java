@@ -8,12 +8,14 @@ import com.example.news.repository.NewsItemRepository;
 
 import java.util.List;
 
-public class ArticlesViewModel extends ViewModel {
+public class ArticlesViewModelTBD extends ViewModel {
 
     private NewsItemRepository newsItemRepository;
+    private boolean mIsPerformingQuery;
 
-    public ArticlesViewModel() {
+    public ArticlesViewModelTBD() {
         newsItemRepository = NewsItemRepository.getInstance();
+        mIsPerformingQuery = false;
     }
 
     public MutableLiveData<List<NewsItem>> getArticlesObserver() {
@@ -21,6 +23,17 @@ public class ArticlesViewModel extends ViewModel {
     }
 
     public void getArticles(String keyword, int pageNumber) {
+        mIsPerformingQuery = true;
         newsItemRepository.getArticles(keyword, pageNumber);
+    }
+
+    public void searchNextPage() {
+        if (!mIsPerformingQuery) {
+            newsItemRepository.searchNextPageForArticles();
+        }
+    }
+
+    public void setIsPerformingQuery(Boolean isPerformingQuery) {
+        mIsPerformingQuery = isPerformingQuery;
     }
 }

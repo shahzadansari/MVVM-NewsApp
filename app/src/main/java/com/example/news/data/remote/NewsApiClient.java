@@ -69,7 +69,14 @@ public class NewsApiClient {
         rootJsonDataCall.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
-                articles.postValue(response.body().getNewsItems());
+                List<NewsItem> articlesList = response.body().getNewsItems();
+                if (pageNumber == 1) {
+                    articles.postValue(articlesList);
+                } else {
+                    List<NewsItem> currentNewsItemList = articles.getValue();
+                    currentNewsItemList.addAll(articlesList);
+                    articles.postValue(currentNewsItemList);
+                }
             }
 
             @Override
@@ -137,7 +144,7 @@ public class NewsApiClient {
         }
 
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        return newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, Utils.API_KEY, pageNumber);
+        return newsAPI.searchArticlesByKeyWord(keyword, SORT_ORDER, language, Utils.API_KEY, pageNumber, 5);
     }
 
 
