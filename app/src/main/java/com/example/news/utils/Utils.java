@@ -14,7 +14,8 @@ import java.util.Random;
 public class Utils {
 
 //    public static final String API_KEY = "c2194f57d73e4392ae4ee0bf69e9d391";
-    public static final String API_KEY = "9be5527ccbff498c87db85f61a585e19";
+//    public static final String API_KEY = "9be5527ccbff498c87db85f61a585e19";
+    public static final String API_KEY = "7044e74d6d8d4aea990766aa30c2e8fd";
 
 
     public static ColorDrawable[] vibrantLightColorList =

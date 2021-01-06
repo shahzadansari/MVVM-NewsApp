@@ -5,7 +5,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,10 +26,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.NewsItemViewModel;
+import com.example.news.ArticlesViewModel;
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
-import com.example.news.viewmodels.ArticlesViewModel;
+import com.example.news.viewmodels.ArticlesViewModelTBD;
 import com.example.newsItem.R;
 
 public class ArticlesFragment extends Fragment {
@@ -47,7 +46,9 @@ public class ArticlesFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private String keyword = "";
 
-    private ArticlesViewModel mArticlesViewModel;
+    private ArticlesViewModelTBD mArticlesViewModel;
+
+    private NewsItemAdapter adapter;
 
     private int pageNumber = 1;
     private static final String TAG = "ArticlesFragment";
@@ -80,52 +81,40 @@ public class ArticlesFragment extends Fragment {
             keyword = savedInstanceState.getString("keyword");
         }
 
-//        mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
-//        initEmptyRecyclerView();
-
-        //setting up recyclerview
-        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-//        recyclerView.setHasFixedSize(true);
-        final NewsItemAdapter adapter = new NewsItemAdapter(mContext);
+        //TODO: Deal with other features i.e, Searching, SwipeRefresh
+        // mArticlesViewModel = ViewModelProviders.of(this).get(ArticlesViewModelTBD.class);
+        initEmptyRecyclerView();
 
         //getting our ItemViewModel
-        NewsItemViewModel itemViewModel = ViewModelProviders.of(this).get(NewsItemViewModel.class);
+        ArticlesViewModel itemViewModel = ViewModelProviders.of(this).get(ArticlesViewModel.class);
         itemViewModel.itemPagedList.observe(getViewLifecycleOwner(), new Observer<PagedList<NewsItem>>() {
             @Override
             public void onChanged(PagedList<NewsItem> newsItems) {
-                Log.d(TAG, "onChanged: snapshot " + newsItems.snapshot().size());
-                Log.d(TAG, "onChanged: size " + newsItems.size());
                 progressBar.setVisibility(View.GONE);
-//                initEmptyRecyclerView();
                 adapter.submitList(newsItems);
-                emptyStateTextView.setVisibility(View.INVISIBLE);
-                swipeRefreshLayout.setRefreshing(false);
-                textViewTitle.setVisibility(View.VISIBLE);
+
+                // TODO: Handle UI changes
+//                if (!newsItems.isEmpty()) {
+//                    emptyStateTextView.setVisibility(View.GONE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    textViewTitle.setVisibility(View.VISIBLE);
+//                }
+//
+//                if (newsItems.isEmpty()) {
+//                    textViewTitle.setVisibility(View.INVISIBLE);
+//                    emptyStateTextView.setVisibility(View.VISIBLE);
+//                    swipeRefreshLayout.setRefreshing(false);
+//                    emptyStateTextView.setText(R.string.no_news_found);
+//                }
             }
         });
-
-        // setting the adapter
-        recyclerView.setAdapter(adapter);
-
-//        fetchData();
 
 //        swipeRefreshLayout.setOnRefreshListener(() -> {
 //            initEmptyRecyclerView();
 //            mArticlesViewModel.getArticles(keyword, pageNumber);
 //        });
 
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-//
-//                if(!recyclerView.canScrollVertically(1)){
-//                    // search the next page
-//                    mArticlesViewModel.searchNextPage();
-//                }
-//            }
-//        });
-
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -175,8 +164,8 @@ public class ArticlesFragment extends Fragment {
 
     public void initEmptyRecyclerView() {
 
-//        adapter = new NewsItemAdapter(mContext);
-//        recyclerView.setAdapter(adapter);
+        adapter = new NewsItemAdapter(mContext);
+        recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
                 (mContext, LinearLayoutManager.VERTICAL, false);

@@ -18,15 +18,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class NewsItemDataSource extends PageKeyedDataSource<Integer, NewsItem> {
+public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
 
     private static final int FIRST_PAGE = 1;
-    private static final String TAG = "NewsItemDataSource";
+    private static final String TAG = "ArticlesDataSource";
+
+    public static final String SORT_ORDER = "publishedAt";
+    public static final String LANGUAGE = "en";
+    public static final String API_KEY = Utils.API_KEY;
+    public static final int PAGE_SIZE = 10;
 
     @Override
     public void loadInitial(@NonNull LoadInitialParams<Integer> params, @NonNull LoadInitialCallback<Integer, NewsItem> callback) {
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", "publishedAt", "en", Utils.API_KEY, FIRST_PAGE, 5);
+        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", SORT_ORDER, LANGUAGE, API_KEY, FIRST_PAGE, PAGE_SIZE);
         call.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -46,7 +51,7 @@ public class NewsItemDataSource extends PageKeyedDataSource<Integer, NewsItem> {
     @Override
     public void loadBefore(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, NewsItem> callback) {
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", "publishedAt", "en", Utils.API_KEY, FIRST_PAGE, 5);
+        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", SORT_ORDER, LANGUAGE, API_KEY, FIRST_PAGE, PAGE_SIZE);
         call.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
@@ -71,7 +76,7 @@ public class NewsItemDataSource extends PageKeyedDataSource<Integer, NewsItem> {
     @Override
     public void loadAfter(@NonNull LoadParams<Integer> params, @NonNull LoadCallback<Integer, NewsItem> callback) {
         NewsAPI newsAPI = ServiceGenerator.createService(NewsAPI.class);
-        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", "publishedAt", "en", Utils.API_KEY, params.key, 5);
+        Call<RootJsonData> call = newsAPI.searchArticlesByKeyWord("news", SORT_ORDER, LANGUAGE, API_KEY, params.key, PAGE_SIZE);
         call.enqueue(new Callback<RootJsonData>() {
             @Override
             public void onResponse(Call<RootJsonData> call, Response<RootJsonData> response) {
