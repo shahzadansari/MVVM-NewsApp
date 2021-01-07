@@ -1,6 +1,8 @@
 package com.example.news;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.paging.DataSource;
 
 import com.example.news.models.NewsItem;
@@ -8,20 +10,19 @@ import com.example.news.utils.DataStatus;
 
 public class ArticlesDataSourceFactory extends DataSource.Factory {
 
-    private MutableLiveData<ArticlesDataSource> itemLiveDataSource;
+    private final MutableLiveData<ArticlesDataSource> itemLiveDataSource = new MutableLiveData<>();
     private String mQuery;
-    private MutableLiveData<DataStatus> dataStatusMutableLiveData = new MutableLiveData<>();
+    private final LiveData<DataStatus> dataStatusLiveData = Transformations
+            .switchMap(itemLiveDataSource, ArticlesDataSource::getDataStatusMutableLiveData);
 
     public ArticlesDataSourceFactory() {
         mQuery = "news";
-        itemLiveDataSource = new MutableLiveData<>();
     }
 
     @Override
     public DataSource<Integer, NewsItem> create() {
         ArticlesDataSource itemDataSource = new ArticlesDataSource(mQuery);
         itemLiveDataSource.postValue(itemDataSource);
-        dataStatusMutableLiveData = itemDataSource.getDataStatusMutableLiveData();
         return itemDataSource;
     }
 
@@ -33,11 +34,7 @@ public class ArticlesDataSourceFactory extends DataSource.Factory {
         mQuery = query;
     }
 
-    public MutableLiveData<DataStatus> getDataStatusMutableLiveData() {
-        return dataStatusMutableLiveData;
-    }
-
-    public void setDataStatusMutableLiveData(DataStatus dataStatus){
-        dataStatusMutableLiveData.postValue(dataStatus);
+    public LiveData<DataStatus> getDataStatusLiveData() {
+        return dataStatusLiveData;
     }
 }

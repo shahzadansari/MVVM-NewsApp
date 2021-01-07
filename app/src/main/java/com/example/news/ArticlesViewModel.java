@@ -14,13 +14,13 @@ public class ArticlesViewModel extends ViewModel {
     public LiveData<PagedList<NewsItem>> itemPagedList;
     private MutableLiveData<ArticlesDataSource> liveDataSource;
     private ArticlesDataSourceFactory articlesDataSourceFactory;
-    private LiveData dataStatus = new MutableLiveData<>();
+    private LiveData dataStatus;
 
     public ArticlesViewModel() {
 
         articlesDataSourceFactory = new ArticlesDataSourceFactory();
         liveDataSource = articlesDataSourceFactory.getArticlesLiveDataSource();
-        dataStatus = articlesDataSourceFactory.getDataStatusMutableLiveData();
+        dataStatus = articlesDataSourceFactory.getDataStatusLiveData();
 
         PagedList.Config pagedListConfig =
                 (new PagedList.Config.Builder())
@@ -31,12 +31,8 @@ public class ArticlesViewModel extends ViewModel {
     }
 
     public void setKeyword(String query) {
-        if (query.equals("") || query.length() == 0)
-            articlesDataSourceFactory.setDataStatusMutableLiveData(DataStatus.EMPTY);
-        else {
-            articlesDataSourceFactory.setQuery(query);
-            refreshData();
-        }
+        articlesDataSourceFactory.setQuery(query);
+        refreshData();
     }
 
     void refreshData() {

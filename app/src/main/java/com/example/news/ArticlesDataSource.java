@@ -1,7 +1,5 @@
 package com.example.news;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.paging.PageKeyedDataSource;
@@ -23,15 +21,13 @@ import retrofit2.Response;
 public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
 
     private static final int FIRST_PAGE = 1;
-    private static final String TAG = "ArticlesDataSource";
-
     public static final String SORT_ORDER = "publishedAt";
     public static final String LANGUAGE = "en";
     public static final String API_KEY = Utils.API_KEY;
     public static final int PAGE_SIZE = 10;
 
     private String mKeyword;
-    private MutableLiveData<DataStatus> dataStatusMutableLiveData = new MutableLiveData<>();
+    private MutableLiveData<DataStatus> dataStatusMutableLiveData;
 
     public ArticlesDataSource(String keyword) {
         mKeyword = keyword;
@@ -54,11 +50,13 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
                     callback.onResult(response.body().getNewsItems(), null, FIRST_PAGE + 1);
                     dataStatusMutableLiveData.postValue(DataStatus.LOADED);
                 }
+                if(response.body().getTotalResults() == 0){
+                    dataStatusMutableLiveData.postValue(DataStatus.EMPTY);
+                }
             }
 
             @Override
             public void onFailure(Call<RootJsonData> call, Throwable t) {
-                Log.d(TAG, "onFailure: " + t.getMessage());
                 dataStatusMutableLiveData.postValue(DataStatus.ERROR);
             }
         });
@@ -85,7 +83,6 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
 
             @Override
             public void onFailure(Call<RootJsonData> call, Throwable t) {
-                Log.d(TAG, "onFailure: " + t.getMessage());
             }
         });
     }
@@ -119,7 +116,6 @@ public class ArticlesDataSource extends PageKeyedDataSource<Integer, NewsItem> {
 
             @Override
             public void onFailure(Call<RootJsonData> call, Throwable t) {
-                Log.d(TAG, "onFailure: " + t.getMessage());
                 dataStatusMutableLiveData.postValue(DataStatus.ERROR);
             }
         });
