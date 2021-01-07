@@ -3,6 +3,7 @@ package com.example.news.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -166,5 +167,14 @@ public class NewsItem implements Parcelable {
         dest.writeString(urlToImage);
         dest.writeString(publishedAt);
         dest.writeString(content);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == this)
+            return true;
+
+        NewsItem newsItem = (NewsItem) obj;
+        return newsItem.id == this.id;
     }
 }
