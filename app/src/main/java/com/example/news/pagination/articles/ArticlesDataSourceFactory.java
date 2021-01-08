@@ -1,4 +1,4 @@
-package com.example.news;
+package com.example.news.pagination.articles;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
