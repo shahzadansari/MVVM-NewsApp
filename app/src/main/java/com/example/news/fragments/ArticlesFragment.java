@@ -25,7 +25,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.example.news.ArticlesViewModel;
+import com.example.news.viewmodels.ArticlesViewModel;
 import com.example.news.adapters.NewsItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.utils.DataStatus;

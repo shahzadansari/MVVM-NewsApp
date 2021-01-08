@@ -1,4 +1,4 @@
-package com.example.news;
+package com.example.news.viewmodels;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+import com.example.news.pagination.articles.ArticlesDataSource;
+import com.example.news.pagination.articles.ArticlesDataSourceFactory;
 import com.example.news.models.NewsItem;
 import com.example.news.utils.DataStatus;
 

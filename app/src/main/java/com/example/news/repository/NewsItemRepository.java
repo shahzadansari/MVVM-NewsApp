@@ -3,7 +3,6 @@ package com.example.news.repository;
 import android.app.Application;
 
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 
 import com.example.news.async.DeleteAllNotesAsyncTask;
 import com.example.news.async.DeleteNoteAsyncTask;
@@ -23,9 +22,6 @@ public class NewsItemRepository {
     private static NewsItemRepository instance;
     private NewsApiClient mNewsApiClient;
 
-    private String mQuery;
-    private int mPageNumber;
-
     public static NewsItemRepository getInstance() {
         if (instance == null) {
             instance = new NewsItemRepository();
@@ -43,18 +39,6 @@ public class NewsItemRepository {
         mAllSavedArticles = mArticleDao.getAllSavedArticles();
     }
 
-    public MutableLiveData<List<NewsItem>> getNewsObserver() {
-        return mNewsApiClient.getNewsObserver();
-    }
-
-    public MutableLiveData<List<NewsItem>> getArticlesObserver() {
-        return mNewsApiClient.getArticlesObserver();
-    }
-
-    public MutableLiveData<List<NewsItem>> getHeadlinesObserver() {
-        return mNewsApiClient.getHeadlinesObserver();
-    }
-
     public LiveData<List<NewsItem>> getAllSavedArticles() {
         return mAllSavedArticles;
     }
@@ -69,26 +53,5 @@ public class NewsItemRepository {
 
     public void deleteAllNotes() {
         new DeleteAllNotesAsyncTask(mArticleDao).execute();
-    }
-
-    public void getHeadlines(String keyword, int pageNumber) {
-        mNewsApiClient.getHeadlines(keyword, pageNumber);
-    }
-
-    public void getArticles(String keyword, int pageNumber) {
-        if (pageNumber == 0) {
-            pageNumber = 1;
-        }
-        mQuery = keyword;
-        mPageNumber = pageNumber;
-        mNewsApiClient.getArticles(keyword, pageNumber);
-    }
-
-    public void searchNextPageForArticles() {
-        mNewsApiClient.getArticles(mQuery, mPageNumber + 1);
-    }
-
-    public void getNews(String keyword, int pageNumber) {
-        mNewsApiClient.getNews(keyword, pageNumber);
     }
 }

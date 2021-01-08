@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.news.adapters.NewsItemAdapter;
+import com.example.news.adapters.FavoritesItemAdapter;
 import com.example.news.models.NewsItem;
 import com.example.news.viewmodels.FavoritesViewModel;
 import com.example.newsItem.R;
@@ -24,11 +24,13 @@ import java.util.List;
 
 public class FavoritesFragment extends Fragment {
 
+    // TODO: Implement Pagination
+
     private TextView emptyStateTextView;
     private TextView textViewTitle;
 
     private RecyclerView recyclerView;
-    private NewsItemAdapter adapter;
+    private FavoritesItemAdapter adapter;
     private Context mContext;
 
     private FavoritesViewModel mFavoritesViewModel;
@@ -54,7 +56,7 @@ public class FavoritesFragment extends Fragment {
         emptyStateTextView = rootView.findViewById(R.id.empty_view);
         textViewTitle = rootView.findViewById(R.id.text_view_top_headlines);
         recyclerView = rootView.findViewById(R.id.recycler_view);
-        adapter = new NewsItemAdapter(mContext);
+        adapter = new FavoritesItemAdapter(mContext);
         initEmptyRecyclerView();
         initAdapterGestures();
 
@@ -72,13 +74,13 @@ public class FavoritesFragment extends Fragment {
                 initEmptyRecyclerView();
 
                 if (!savedArticles.isEmpty()) {
-//                    adapter.submitList(savedArticles);
+                    adapter.submitList(savedArticles);
                     emptyStateTextView.setVisibility(View.INVISIBLE);
                     textViewTitle.setVisibility(View.VISIBLE);
                 }
 
                 if (savedArticles.isEmpty()) {
-//                    adapter.submitList(savedArticles);
+                    adapter.submitList(savedArticles);
                     emptyStateTextView.setVisibility(View.VISIBLE);
                     emptyStateTextView.setText("No Articles Found!");
                     textViewTitle.setVisibility(View.INVISIBLE);
@@ -88,7 +90,7 @@ public class FavoritesFragment extends Fragment {
     }
 
     private void initEmptyRecyclerView() {
-        adapter = new NewsItemAdapter(mContext);
+        adapter = new FavoritesItemAdapter(mContext);
         recyclerView.setAdapter(adapter);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager
