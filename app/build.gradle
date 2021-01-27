@@ -58,7 +58,7 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
 
     // materialdesign
-    implementation 'com.google.android.material:material:1.3.0-beta01'
+    implementation 'com.google.android.material:material:1.3.0-rc01'
 
     // prettytime
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.4.Final'
@@ -79,4 +79,10 @@ dependencies {
 
     // paging
     implementation "android.arch.paging:runtime:1.0.1"
+
+    // navigation components
+    implementation "androidx.navigation:navigation-fragment:2.3.3"
+    implementation "androidx.navigation:navigation-ui:2.3.3"
 }
+/** Safe Args */
+apply plugin: "androidx.navigation.safeargs"
